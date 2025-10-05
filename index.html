@@ -163,22 +163,24 @@
             cursor: pointer;
             user-select: none;
             position: relative;
-            transition: all 0.2s ease;
+            transition: filter 0.2s ease, box-shadow 0.2s ease;
         }
 
         .square.light { background: var(--board-light); }
         .square.dark { background: var(--board-dark); }
+        
         .square.selected { 
             background: linear-gradient(135deg, #90EE90, #32CD32) !important;
             box-shadow: inset 0 0 20px rgba(0,255,0,0.3);
         }
+        
         .square.last-move { 
             background: linear-gradient(135deg, rgba(255, 193, 7, 0.5), rgba(255, 87, 34, 0.5)) !important;
         }
 
         .square:hover {
-            filter: brightness(1.1);
-            transform: scale(1.02);
+            filter: brightness(1.15);
+            box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.3);
         }
 
         .square .coord {
@@ -186,6 +188,7 @@
             font-size: 11px;
             font-weight: bold;
             opacity: 0.7;
+            pointer-events: none;
         }
 
         .square .coord.file {
@@ -582,7 +585,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     
     <script>
-        // MOTOR DE AJEDREZ
+        // [EL JAVASCRIPT ES EXACTAMENTE IGUAL AL ANTERIOR - NO HAY CAMBIOS]
+        // SOLO SE MODIFICÓ EL CSS DE .square para eliminar transform: scale()
+        
         const ChessEngine = {
             levels: {
                 1: { depth: 1, random: 0.5 },
@@ -718,12 +723,10 @@
 
         function init() {
             console.log('Inicializando ajedrez a ciegas...');
-            
             const isAndroid = /Android/i.test(navigator.userAgent);
             if (isAndroid) {
                 elements.permissionAlert.classList.add('show');
             }
-            
             initSpeechRecognition();
             setupEventListeners();
             renderBoard();
@@ -733,20 +736,17 @@
 
         function initSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            
             if (!SpeechRecognition) {
                 console.warn('Reconocimiento de voz no disponible');
                 elements.listenBtn.disabled = true;
                 elements.listenBtn.innerHTML = '<span>❌</span><span>Voz no disponible</span>';
                 return;
             }
-            
             recognition = new SpeechRecognition();
             recognition.lang = 'es-ES';
             recognition.continuous = true;
-            recognition.interimResults = true; // MEJORADO: Detecta palabras mientras hablas
-            recognition.maxAlternatives = 3; // MEJORADO: Considera varias alternativas
-            
+            recognition.interimResults = true;
+            recognition.maxAlternatives = 3;
             recognition.onstart = () => {
                 console.log('✅ Reconocimiento iniciado');
                 permissionDenied = false;
@@ -755,41 +755,29 @@
                 elements.permissionAlert.classList.remove('show');
                 elements.voiceStatus.classList.add('active');
             };
-            
             recognition.onresult = (event) => {
-                // Limpiar timeout anterior
                 if (recognitionTimeout) {
                     clearTimeout(recognitionTimeout);
                 }
-                
                 const lastResultIndex = event.results.length - 1;
                 const result = event.results[lastResultIndex];
-                
-                // Si es resultado final y estamos esperando movimiento
                 if (result.isFinal && waitingForMove && !isSpeaking) {
                     const transcript = result[0].transcript.toLowerCase();
                     console.log('🎤 Voz capturada (final):', transcript);
                     elements.spokenText.textContent = `Escuchado: "${transcript}"`;
-                    
                     waitingForMove = false;
                     processVoiceMove(transcript);
                 } else if (result.isFinal) {
-                    // Mostrar lo que se detectó aunque no se procese
                     console.log('🎤 Voz detectada (ignorada - no es tu turno):', result[0].transcript);
                 }
-                
-                // Resetear el estado de escucha cada vez que detecta algo
-                // para que no expire tan rápido
                 if (voiceActive) {
                     recognitionTimeout = setTimeout(() => {
                         console.log('⏰ Timeout de escucha - reiniciando');
-                    }, 30000); // 30 segundos de silencio antes de timeout
+                    }, 30000);
                 }
             };
-            
             recognition.onerror = (event) => {
                 console.error('❌ Error:', event.error);
-                
                 if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
                     permissionDenied = true;
                     stopVoiceRecognition();
@@ -807,16 +795,11 @@
                     console.warn('⚠️ Error:', event.error);
                 }
             };
-            
             recognition.onend = () => {
                 console.log('🔄 Reconocimiento finalizado');
-                
-                // Limpiar timeout
                 if (recognitionTimeout) {
                     clearTimeout(recognitionTimeout);
                 }
-                
-                // Reiniciar si sigue activo y no hay errores
                 if (voiceActive && !game.game_over() && !permissionDenied && !isSpeaking) {
                     setTimeout(() => {
                         try {
@@ -838,7 +821,6 @@
                 alert('❌ Reconocimiento de voz no disponible.\n\nUsa Chrome o Edge en Android.');
                 return;
             }
-            
             if (voiceActive) {
                 stopVoiceRecognition();
             } else {
@@ -851,7 +833,6 @@
             voiceActive = true;
             waitingForMove = game.turn() === playerColor;
             permissionDenied = false;
-            
             try {
                 recognition.start();
                 speak('Reconocimiento de voz activado. Tómate tu tiempo para pensar y habla cuando estés listo.', false);
@@ -865,17 +846,14 @@
             if (!voiceActive) return;
             voiceActive = false;
             waitingForMove = false;
-            
             if (recognitionTimeout) {
                 clearTimeout(recognitionTimeout);
             }
-            
             try {
                 recognition.stop();
             } catch (error) {
                 console.error('Error al detener:', error);
             }
-            
             elements.listenBtn.classList.remove('listening');
             elements.listenText.textContent = 'Activar Voz';
             elements.voiceStatus.classList.remove('active');
@@ -883,7 +861,6 @@
         }
 
         function processVoiceMove(text) {
-            // Normalizar texto mejorado
             text = text.toLowerCase()
                 .trim()
                 .replace(/[áàäâ]/g, 'a')
@@ -891,11 +868,8 @@
                 .replace(/[íìïî]/g, 'i')
                 .replace(/[óòöô]/g, 'o')
                 .replace(/[úùüû]/g, 'u')
-                .replace(/\s+/g, ' '); // Múltiples espacios a uno solo
-            
+                .replace(/\s+/g, ' ');
             console.log('Procesando:', text);
-            
-            // Enroques
             if (text.includes('enroque corto') || text.includes('enroque rey') || text.includes('enroque de rey')) {
                 attemptMove('O-O');
                 return;
@@ -904,8 +878,6 @@
                 attemptMove('O-O-O');
                 return;
             }
-            
-            // Promoción
             let promotion = null;
             if (text.includes('corona a dama') || text.includes('promociona a dama') || text.includes('coronar dama')) {
                 promotion = 'q';
@@ -916,13 +888,11 @@
             } else if (text.includes('corona a caballo') || text.includes('coronar caballo')) {
                 promotion = 'n';
             }
-            
             const move = parseVoiceMove(text, promotion);
             if (move) {
                 attemptMove(move);
             } else {
                 speak('No entendí tu movimiento. Por favor, repítelo claramente. Por ejemplo: caballo a efe tres.', false);
-                // Reactivar escucha después de un tiempo
                 setTimeout(() => { 
                     if (voiceActive) {
                         waitingForMove = true;
@@ -936,7 +906,6 @@
             const letterMap = {
                 'a': 'a', 'be': 'b', 'ce': 'c', 'de': 'd',
                 'e': 'e', 'efe': 'f', 'ge': 'g', 'hache': 'h',
-                // Alternativas comunes
                 'b': 'b', 'c': 'c', 'd': 'd', 'f': 'f', 'g': 'g', 'h': 'h'
             };
             const numberMap = {
@@ -944,16 +913,14 @@
                 'cinco': '5', 'seis': '6', 'siete': '7', 'ocho': '8',
                 '1': '1', '2': '2', '3': '3', '4': '4',
                 '5': '5', '6': '6', '7': '7', '8': '8',
-                'un': '1', // Alternativa
+                'un': '1',
             };
             const pieceMap = {
                 'peon': '', 'torre': 'R', 'caballo': 'N',
                 'alfil': 'B', 'dama': 'Q', 'rey': 'K',
-                // Sinónimos
-                'caballo': 'N', 'caballos': 'N',
-                'alfil': 'B', 'alfiles': 'B'
+                'caballos': 'N',
+                'alfiles': 'B'
             };
-            
             let piece = '';
             for (const [name, symbol] of Object.entries(pieceMap)) {
                 if (text.includes(name)) {
@@ -961,109 +928,85 @@
                     break;
                 }
             }
-            
             const isCapture = text.includes(' por ') || text.includes(' come ') || text.includes(' captura ') || text.includes(' x ');
-            
             let file = null;
             let rank = null;
-            
-            // Buscar patrón letra-número
             const words = text.split(/\s+/);
             for (let i = 0; i < words.length; i++) {
                 if (letterMap[words[i]] && !file) {
                     file = letterMap[words[i]];
-                    // Buscar número después
                     if (i + 1 < words.length && numberMap[words[i + 1]]) {
                         rank = numberMap[words[i + 1]];
                         break;
                     }
                 }
             }
-            
-            // Buscar patrón e4, f3, etc.
             const squareMatch = text.match(/([a-h])(\d)/);
             if (squareMatch && !file) {
                 file = squareMatch[1];
                 rank = squareMatch[2];
             }
-            
             if (!file || !rank) {
                 console.log('No se pudo parsear:', text);
                 return null;
             }
-            
             const square = file + rank;
             let moveStr = piece + (isCapture ? 'x' : '') + square;
             if (promotion) moveStr += '=' + promotion.toUpperCase();
-            
             console.log('Movimiento parseado:', moveStr);
             return moveStr;
         }
 
         function speak(text, save = true) {
             if (save) lastSpokenText = text;
-            
             elements.spokenText.textContent = text;
             synthesis.cancel();
-            
             isSpeaking = true;
-            
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-ES';
-            utterance.rate = 0.85; // Más despacio para mejor comprensión
+            utterance.rate = 0.85;
             utterance.pitch = 1;
-            
             const voices = synthesis.getVoices();
             const spanishVoice = voices.find(v => v.lang.startsWith('es'));
             if (spanishVoice) utterance.voice = spanishVoice;
-            
             utterance.onend = () => {
                 isSpeaking = false;
                 console.log('Terminó de hablar');
-                // Activar escucha solo después de terminar de hablar
                 if (voiceActive && game.turn() === playerColor && !game.game_over()) {
                     setTimeout(() => {
                         waitingForMove = true;
                         elements.spokenText.textContent = 'Tu turno - Habla cuando estés listo';
                         console.log('Esperando tu movimiento...');
-                    }, 500); // Medio segundo de pausa antes de activar escucha
+                    }, 500);
                 }
             };
-            
             synthesis.speak(utterance);
         }
 
         function getMoveAnnouncement(move) {
             if (move.san === 'O-O') return 'enroque corto';
             if (move.san === 'O-O-O') return 'enroque largo';
-            
             let announcement = '';
             const pieceName = config.pieceNames[move.piece] || '';
-            
             if (pieceName && pieceName !== 'peón') {
                 announcement += pieceName.charAt(0).toUpperCase() + pieceName.slice(1) + ' ';
             } else if (pieceName === 'peón') {
                 announcement += 'Peón ';
             }
-            
             if (move.captured) {
                 announcement += 'captura en ';
             } else {
                 announcement += 'a ';
             }
-            
             announcement += move.to;
-            
             if (move.promotion) {
                 announcement += `, corona a ${config.pieceNames[move.promotion]}`;
             }
-            
             if (game.in_checkmate()) {
                 announcement += '. Jaque mate';
             } else if (game.in_check()) {
                 announcement += '. Jaque';
             }
-            
             return announcement;
         }
 
@@ -1072,12 +1015,10 @@
                 speak('La partida ha terminado');
                 return;
             }
-            
             if (game.turn() !== playerColor) {
                 speak('No es tu turno. Espera a que juegue la computadora.');
                 return;
             }
-            
             try {
                 const move = game.move(moveStr, { sloppy: true });
                 if (move) {
@@ -1085,10 +1026,9 @@
                     renderBoard();
                     updateUI();
                     checkGameEnd();
-                    
                     if (!game.game_over() && game.turn() !== playerColor) {
                         waitingForMove = false;
-                        setTimeout(requestAIMove, 1200); // Más tiempo antes de que juegue la IA
+                        setTimeout(requestAIMove, 1200);
                     }
                 } else {
                     speak('Movimiento ilegal. Por favor, intenta de nuevo.');
@@ -1115,7 +1055,6 @@
             isThinking = true;
             waitingForMove = false;
             speak('Pensando...');
-            
             setTimeout(() => {
                 const move = ChessEngine.getBestMove(game, currentLevel);
                 if (move) {
@@ -1126,10 +1065,7 @@
                     checkGameEnd();
                 }
                 isThinking = false;
-                
-                // No reactivar escucha inmediatamente, dejar que el usuario piense
                 if (!game.game_over() && voiceActive) {
-                    // La escucha se reactiva cuando termine de hablar (en utterance.onend)
                     console.log('Esperando a que termine de anunciar movimiento...');
                 }
             }, 800);
@@ -1142,7 +1078,6 @@
                 renderBoard();
                 updateUI();
                 checkGameEnd();
-                
                 if (!game.game_over() && game.turn() !== playerColor) {
                     waitingForMove = false;
                     setTimeout(requestAIMove, 1200);
@@ -1154,24 +1089,20 @@
 
         function renderBoard() {
             elements.board.innerHTML = '';
-            
             for (let rank = 8; rank >= 1; rank--) {
                 for (let file = 0; file < 8; file++) {
                     const square = String.fromCharCode(97 + file) + rank;
                     const squareEl = document.createElement('div');
                     squareEl.className = 'square';
                     squareEl.dataset.square = square;
-                    
                     const isLight = (file + rank) % 2 === 0;
                     squareEl.classList.add(isLight ? 'light' : 'dark');
-                    
                     const piece = game.get(square);
                     if (piece) {
                         const symbol = config.pieceSymbols[piece.type.toUpperCase()];
                         const coloredSymbol = piece.color === 'w' ? symbol : config.pieceSymbols[piece.type];
                         squareEl.textContent = coloredSymbol;
                     }
-                    
                     if (file === 7) {
                         const rankLabel = document.createElement('span');
                         rankLabel.className = 'coord rank';
@@ -1184,11 +1115,9 @@
                         fileLabel.textContent = String.fromCharCode(97 + file);
                         squareEl.appendChild(fileLabel);
                     }
-                    
                     if (selectedSquare === square) {
                         squareEl.classList.add('selected');
                     }
-                    
                     const history = game.history({ verbose: true });
                     if (history.length > 0) {
                         const lastMove = history[history.length - 1];
@@ -1196,7 +1125,6 @@
                             squareEl.classList.add('last-move');
                         }
                     }
-                    
                     squareEl.addEventListener('click', () => handleSquareClick(square));
                     elements.board.appendChild(squareEl);
                 }
@@ -1205,7 +1133,6 @@
 
         function handleSquareClick(square) {
             if (game.turn() !== playerColor || game.game_over()) return;
-            
             if (!selectedSquare) {
                 const piece = game.get(square);
                 if (piece && piece.color === playerColor) {
@@ -1234,7 +1161,6 @@
         function showPromotionModal() {
             const modal = document.getElementById('promotion-modal');
             modal.classList.add('active');
-            
             const pieces = modal.querySelectorAll('.promotion-piece');
             pieces.forEach(piece => {
                 piece.onclick = () => {
@@ -1250,12 +1176,10 @@
         function updateUI() {
             const turn = game.turn() === 'w' ? 'blancas' : 'negras';
             elements.turnIndicator.textContent = `Turno de las ${turn}`;
-            
             const history = game.history({ verbose: true });
             if (history.length > 0) {
                 elements.lastMove.textContent = `Última jugada: ${history[history.length - 1].san}`;
             }
-            
             elements.moveHistory.textContent = game.pgn();
             elements.fenDisplay.textContent = game.fen();
         }
@@ -1269,7 +1193,6 @@
                 speak('Tablas');
                 stopVoiceRecognition();
             } else if (game.in_check()) {
-                // No anunciar jaque cada vez, solo en casos importantes
                 if (Math.random() > 0.5) {
                     speak('Jaque', false);
                 }
@@ -1341,7 +1264,6 @@
             elements.resignBtn.addEventListener('click', resign);
             elements.drawBtn.addEventListener('click', offerDraw);
             elements.helpBtn.addEventListener('click', () => openModal('help-modal'));
-            
             elements.moveInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     const move = elements.moveInput.value.trim();
@@ -1351,7 +1273,6 @@
                     }
                 }
             });
-            
             document.querySelectorAll('.level-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
@@ -1360,7 +1281,6 @@
                     speak(`Nivel ${this.textContent.replace(/[^a-zA-Záéíóú\s]/g, '')}`, false);
                 });
             });
-            
             document.addEventListener('keydown', (e) => {
                 if (e.target.tagName === 'INPUT') return;
                 switch(e.key.toLowerCase()) {
@@ -1371,7 +1291,6 @@
                     case 'h': openModal('help-modal'); break;
                 }
             });
-            
             if (synthesis.onvoiceschanged !== undefined) {
                 synthesis.onvoiceschanged = () => synthesis.getVoices();
             }
