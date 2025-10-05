@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ajedrez a Ciegas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gradient-start: #FF6B35;
+            --gradient-end: #004E89;
+            --primary: #FF8C42;
+            --secondary: #0077B6;
+            --success: #06D6A0;
+            --danger: #EF476F;
+            --warning: #FFD166;
+            --light: #F8F9FA;
+            --dark: #1A1A2E;
+            --board-light: #F0D9B5;
+            --board-dark: #B58863;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            background-attachment: fixed;
+            color: #333;
+            min-height: 100vh;
+            padding: 15px;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 25px;
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .level-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .level-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            border: 3px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) border-box;
+            color: var(--dark);
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .level-btn.active {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 107, 53, 0.4);
+        }
+
+        .game-status {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(0, 78, 137, 0.1));
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            border: 2px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .game-status h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-status p {
+            font-size: 16px;
+            color: var(--dark);
+            margin: 8px 0;
+        }
+
+        #spoken-text {
+            background: white;
+            padding: 12px;
+            border-left: 5px solid var(--primary);
+            margin-top: 12px;
+            font-style: italic;
+            min-height: 50px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        #board-container {
+            margin: 25px auto;
+            max-width: 500px;
+            display: block;
+        }
+
+        #board-container.hidden {
+            display: none;
+        }
+
+        #board {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            aspect-ratio: 1;
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
+            border: 5px solid var(--dark);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .square {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(28px, 7vw, 52px);
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .square.light { background: var(--board-light); }
+        .square.dark { background: var(--board-dark); }
+        .square.selected { 
+            background: linear-gradient(135deg, #90EE90, #32CD32) !important;
+            box-shadow: inset 0 0 20px rgba(0,255,0,0.3);
+        }
+        .square.last-move { 
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.5), rgba(255, 87, 34, 0.5)) !important;
+        }
+
+        .square:hover {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+
+        .square .coord {
+            position: absolute;
+            font-size: 11px;
+            font-weight: bold;
+            opacity: 0.7;
+        }
+
+        .square .coord.file {
+            bottom: 3px;
+            right: 5px;
+        }
+
+        .square .coord.rank {
+            top: 3px;
+            left: 5px;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 14px 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            touch-action: manipulation;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary { 
+            background: linear-gradient(135deg, #0077B6, #004E89);
+            color: white; 
+        }
+        .btn-success { 
+            background: linear-gradient(135deg, #06D6A0, #048861);
+            color: white; 
+        }
+        .btn-danger { 
+            background: linear-gradient(135deg, #EF476F, #C1184A);
+            color: white; 
+        }
+        .btn-warning { 
+            background: linear-gradient(135deg, #FFD166, #FF9F1C);
+            color: white; 
+        }
+        .btn-secondary { 
+            background: linear-gradient(135deg, #E0E0E0, #BDBDBD);
+            color: var(--dark); 
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        #listen-btn {
+            flex: 1;
+            padding: 18px;
+            font-size: 17px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #listen-btn.listening {
+            background: linear-gradient(135deg, #EF476F, #C1184A);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(239, 71, 111, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(239, 71, 111, 0.6); }
+        }
+
+        #move-input {
+            padding: 15px;
+            border: 3px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) border-box;
+            border-radius: 12px;
+            font-size: 16px;
+            width: 100%;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        #move-input:focus {
+            outline: none;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+        }
+
+        #history-container {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(0, 78, 137, 0.05));
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 2px solid rgba(0, 78, 137, 0.2);
+        }
+
+        #history-container h3 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        #move-history {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            color: var(--dark);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-content ul {
+            margin-left: 20px;
+            line-height: 2;
+        }
+
+        #promotion-modal .promotion-pieces {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .promotion-piece {
+            padding: 25px;
+            font-size: 52px;
+            text-align: center;
+            border: 4px solid transparent;
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) border-box;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .promotion-piece:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .alert-box {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2));
+            border-left: 5px solid #FF9800;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert-box.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .controls {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .btn {
+                padding: 12px 14px;
+                font-size: 14px;
+            }
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>♟️ Ajedrez a Ciegas ♟️</h1>
+
+        <div class="alert-box" id="permission-alert">
+            📱 <strong>Android:</strong> Si no funciona la voz, ve a: Chrome ⋮ → Configuración → Configuración de sitios → Micrófono → Permitir
+        </div>
+
+        <div class="level-selector">
+            <button class="level-btn active" data-level="1">😊 Muy Fácil</button>
+            <button class="level-btn" data-level="2">🙂 Fácil</button>
+            <button class="level-btn" data-level="3">🤔 Medio</button>
+            <button class="level-btn" data-level="4">😰 Difícil</button>
+            <button class="level-btn" data-level="5">🔥 Muy Difícil</button>
+        </div>
+
+        <div class="game-status">
+            <h2 id="turn-indicator">Turno de las blancas</h2>
+            <p id="last-move">Última jugada: -</p>
+            <div id="spoken-text" role="status" aria-live="polite">Presiona "Activar Voz" para comenzar</div>
+        </div>
+
+        <div class="voice-controls">
+            <button id="listen-btn" class="btn btn-success">
+                <span>🎤</span>
+                <span id="listen-text">Activar Voz</span>
+            </button>
+            <button id="repeat-btn" class="btn btn-secondary">
+                🔊 Repetir
+            </button>
+        </div>
+
+        <input type="text" id="move-input" placeholder="O escribe tu movimiento: e4, Cf3, enroque corto...">
+
+        <div class="controls">
+            <button id="toggle-board-btn" class="btn btn-primary">👁️ Ocultar</button>
+            <button id="new-game-btn" class="btn btn-success">🆕 Nueva</button>
+            <button id="undo-btn" class="btn btn-warning">↩️ Deshacer</button>
+            <button id="resign-btn" class="btn btn-danger">🏳️ Rendirse</button>
+            <button id="draw-btn" class="btn btn-secondary">🤝 Tablas</button>
+            <button id="help-btn" class="btn btn-secondary">❓ Ayuda</button>
+        </div>
+
+        <div id="board-container">
+            <div id="board"></div>
+        </div>
+
+        <div id="history-container">
+            <h3>📋 Historial de movimientos</h3>
+            <div id="move-history"></div>
+            <p style="margin-top: 12px; font-size: 13px; opacity: 0.7;"><strong>FEN:</strong> <span id="fen-display"></span></p>
+        </div>
+    </div>
+
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <h2>❓ Ayuda - Comandos de voz</h2>
+            <h3>🎯 Ejemplos de movimientos:</h3>
+            <ul>
+                <li><strong>Peones:</strong> "e4", "peón a e cuatro", "peón por d5"</li>
+                <li><strong>Piezas:</strong> "Caballo f3", "Alfil por c4", "Torre a d1"</li>
+                <li><strong>Enroques:</strong> "enroque corto", "enroque largo"</li>
+                <li><strong>Promoción:</strong> "peón a e8 corona a dama"</li>
+            </ul>
+            <h3>🔤 Formato de casillas:</h3>
+            <ul>
+                <li>Letras: a, be, ce, de, e, efe, ge, hache</li>
+                <li>Números: uno, dos, tres, cuatro, cinco, seis, siete, ocho</li>
+            </ul>
+            <h3>⌨️ Atajos de teclado:</h3>
+            <ul>
+                <li><strong>N:</strong> Nueva partida</li>
+                <li><strong>M:</strong> Mostrar/Ocultar tablero</li>
+                <li><strong>E:</strong> Activar voz</li>
+                <li><strong>R:</strong> Repetir locución</li>
+                <li><strong>H:</strong> Ayuda</li>
+            </ul>
+            <h3>📱 Problemas con el micrófono en Android:</h3>
+            <ul>
+                <li>1. Abre Chrome en tu móvil</li>
+                <li>2. Toca los 3 puntos (⋮) arriba a la derecha</li>
+                <li>3. Configuración → Configuración de sitios</li>
+                <li>4. Micrófono → Activar "Preguntar primero"</li>
+                <li>5. Recarga esta página</li>
+            </ul>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">Cerrar</button>
+        </div>
+    </div>
+
+    <div id="promotion-modal" class="modal">
+        <div class="modal-content">
+            <h2>👑 Promoción de peón</h2>
+            <p>Selecciona la pieza a la que deseas promocionar:</p>
+            <div class="promotion-pieces">
+                <div class="promotion-piece" data-piece="q" title="Dama">♕</div>
+                <div class="promotion-piece" data-piece="r" title="Torre">♖</div>
+                <div class="promotion-piece" data-piece="b" title="Alfil">♗</div>
+                <div class="promotion-piece" data-piece="n" title="Caballo">♘</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    
+    <script>
+        // MOTOR DE AJEDREZ
+        const ChessEngine = {
+            levels: {
+                1: { depth: 1, random: 0.5 },
+                2: { depth: 2, random: 0.3 },
+                3: { depth: 3, random: 0.1 },
+                4: { depth: 4, random: 0.05 },
+                5: { depth: 5, random: 0 }
+            },
+            pieceValues: {
+                'p': 100, 'n': 320, 'b': 330,
+                'r': 500, 'q': 900, 'k': 20000
+            },
+            evaluate(game) {
+                if (game.in_checkmate()) return game.turn() === 'w' ? -99999 : 99999;
+                if (game.in_draw()) return 0;
+                let score = 0;
+                const board = game.board();
+                for (let i = 0; i < 8; i++) {
+                    for (let j = 0; j < 8; j++) {
+                        const piece = board[i][j];
+                        if (piece) {
+                            const value = this.pieceValues[piece.type];
+                            score += piece.color === 'w' ? value : -value;
+                        }
+                    }
+                }
+                return score;
+            },
+            minimax(game, depth, alpha, beta, maximizing) {
+                if (depth === 0 || game.game_over()) return this.evaluate(game);
+                const moves = game.moves({ verbose: true });
+                if (maximizing) {
+                    let maxEval = -Infinity;
+                    for (const move of moves) {
+                        game.move(move);
+                        const evaluation = this.minimax(game, depth - 1, alpha, beta, false);
+                        game.undo();
+                        maxEval = Math.max(maxEval, evaluation);
+                        alpha = Math.max(alpha, evaluation);
+                        if (beta <= alpha) break;
+                    }
+                    return maxEval;
+                } else {
+                    let minEval = Infinity;
+                    for (const move of moves) {
+                        game.move(move);
+                        const evaluation = this.minimax(game, depth - 1, alpha, beta, true);
+                        game.undo();
+                        minEval = Math.min(minEval, evaluation);
+                        beta = Math.min(beta, evaluation);
+                        if (beta <= alpha) break;
+                    }
+                    return minEval;
+                }
+            },
+            getBestMove(game, level) {
+                const config = this.levels[level];
+                const moves = game.moves({ verbose: true });
+                if (moves.length === 0) return null;
+                if (Math.random() < config.random) {
+                    return moves[Math.floor(Math.random() * moves.length)];
+                }
+                let bestMove = null;
+                let bestValue = game.turn() === 'b' ? Infinity : -Infinity;
+                for (const move of moves) {
+                    game.move(move);
+                    const value = this.minimax(game, config.depth - 1, -Infinity, Infinity, game.turn() === 'w');
+                    game.undo();
+                    if (game.turn() === 'b') {
+                        if (value < bestValue) {
+                            bestValue = value;
+                            bestMove = move;
+                        }
+                    } else {
+                        if (value > bestValue) {
+                            bestValue = value;
+                            bestMove = move;
+                        }
+                    }
+                }
+                return bestMove;
+            }
+        };
+
+        // CONFIGURACIÓN
+        const config = {
+            pieceSymbols: {
+                'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+                'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+            },
+            pieceNames: {
+                'p': 'peón', 'n': 'caballo', 'b': 'alfil',
+                'r': 'torre', 'q': 'dama', 'k': 'rey'
+            }
+        };
+
+        // ESTADO
+        let game = new Chess();
+        let recognition = null;
+        let synthesis = window.speechSynthesis;
+        let currentLevel = 1;
+        let playerColor = 'w';
+        let boardVisible = true;
+        let selectedSquare = null;
+        let isThinking = false;
+        let lastSpokenText = '';
+        let pendingPromotion = null;
+        let voiceActive = false;
+        let waitingForMove = false;
+        let permissionDenied = false;
+
+        // ELEMENTOS DOM
+        const elements = {
+            board: document.getElementById('board'),
+            boardContainer: document.getElementById('board-container'),
+            turnIndicator: document.getElementById('turn-indicator'),
+            lastMove: document.getElementById('last-move'),
+            spokenText: document.getElementById('spoken-text'),
+            moveHistory: document.getElementById('move-history'),
+            fenDisplay: document.getElementById('fen-display'),
+            moveInput: document.getElementById('move-input'),
+            listenBtn: document.getElementById('listen-btn'),
+            listenText: document.getElementById('listen-text'),
+            repeatBtn: document.getElementById('repeat-btn'),
+            toggleBoardBtn: document.getElementById('toggle-board-btn'),
+            newGameBtn: document.getElementById('new-game-btn'),
+            undoBtn: document.getElementById('undo-btn'),
+            resignBtn: document.getElementById('resign-btn'),
+            drawBtn: document.getElementById('draw-btn'),
+            helpBtn: document.getElementById('help-btn'),
+            permissionAlert: document.getElementById('permission-alert')
+        };
+
+        function init() {
+            console.log('Inicializando ajedrez a ciegas...');
+            
+            // Detectar Android
+            const isAndroid = /Android/i.test(navigator.userAgent);
+            if (isAndroid) {
+                elements.permissionAlert.classList.add('show');
+            }
+            
+            initSpeechRecognition();
+            setupEventListeners();
+            renderBoard();
+            updateUI();
+            speak('Bienvenido al ajedrez a ciegas. Nueva partida. Juegan las blancas.');
+        }
+
+        function initSpeechRecognition() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                console.warn('Reconocimiento de voz no disponible');
+                elements.listenBtn.disabled = true;
+                elements.listenBtn.innerHTML = '<span>❌</span><span>Voz no disponible</span>';
+                return;
+            }
+            
+            recognition = new SpeechRecognition();
+            recognition.lang = 'es-ES';
+            recognition.continuous = true;
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+            
+            recognition.onstart = () => {
+                console.log('✅ Reconocimiento iniciado correctamente');
+                permissionDenied = false;
+                elements.listenBtn.classList.add('listening');
+                elements.listenText.textContent = 'Escuchando...';
+                elements.permissionAlert.classList.remove('show');
+            };
+            
+            recognition.onresult = (event) => {
+                if (!waitingForMove) return;
+                const lastResultIndex = event.results.length - 1;
+                const transcript = event.results[lastResultIndex][0].transcript.toLowerCase();
+                console.log('🎤 Voz capturada:', transcript);
+                elements.spokenText.textContent = `Escuchado: "${transcript}"`;
+                waitingForMove = false;
+                processVoiceMove(transcript);
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('❌ Error de reconocimiento:', event.error);
+                
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    permissionDenied = true;
+                    stopVoiceRecognition();
+                    elements.permissionAlert.classList.add('show');
+                    
+                    alert('🚫 PERMISO DE MICRÓFONO DENEGADO\n\n' +
+                          '📱 Para ANDROID, sigue estos pasos:\n\n' +
+                          '1. Toca los 3 puntos (⋮) en Chrome\n' +
+                          '2. Configuración\n' +
+                          '3. Configuración de sitios\n' +
+                          '4. Micrófono\n' +
+                          '5. Activa "Preguntar primero"\n' +
+                          '6. Recarga esta página\n\n' +
+                          'O usa la entrada manual escribiendo los movimientos.');
+                } else if (event.error === 'no-speech') {
+                    console.log('⚠️ No se detectó voz, continuando...');
+                } else if (event.error === 'audio-capture') {
+                    permissionDenied = true;
+                    stopVoiceRecognition();
+                    alert('❌ No se puede acceder al micrófono.\n\nVerifica:\n• Micrófono conectado\n• Permisos en Configuración > Apps > Chrome');
+                } else {
+                    console.warn('⚠️ Error:', event.error);
+                }
+            };
+            
+            recognition.onend = () => {
+                console.log('🔄 Reconocimiento finalizado');
+                if (voiceActive && !game.game_over() && !permissionDenied) {
+                    console.log('Reiniciando reconocimiento...');
+                    setTimeout(() => {
+                        try {
+                            recognition.start();
+                        } catch (e) {
+                            console.log('No se puede reiniciar:', e);
+                        }
+                    }, 300);
+                } else {
+                    elements.listenBtn.classList.remove('listening');
+                    elements.listenText.textContent = 'Activar Voz';
+                }
+            };
+        }
+
+        function toggleVoiceRecognition() {
+            if (!recognition) {
+                alert('❌ Reconocimiento de voz no disponible.\n\nUsa Chrome o Edge en Android.\n\nO escribe los movimientos manualmente.');
+                return;
+            }
+            
+            if (voiceActive) {
+                stopVoiceRecognition();
+            } else {
+                startVoiceRecognition();
+            }
+        }
+
+        function startVoiceRecognition() {
+            if (voiceActive) return;
+            voiceActive = true;
+            waitingForMove = true;
+            permissionDenied = false;
+            
+            try {
+                recognition.start();
+                speak('Reconocimiento de voz activado. Di tu movimiento cuando sea tu turno.', false);
+            } catch (error) {
+                console.error('Error al iniciar:', error);
+                voiceActive = false;
+                if (error.name === 'InvalidStateError') {
+                    console.log('El reconocimiento ya estaba activo');
+                }
+            }
+        }
+
+        function stopVoiceRecognition() {
+            if (!voiceActive) return;
+            voiceActive = false;
+            waitingForMove = false;
+            
+            try {
+                recognition.stop();
+            } catch (error) {
+                console.error('Error al detener:', error);
+            }
+            
+            elements.listenBtn.classList.remove('listening');
+            elements.listenText.textContent = 'Activar Voz';
+            speak('Reconocimiento de voz desactivado.', false);
+        }
+
+        function processVoiceMove(text) {
+            text = text.toLowerCase()
+                .replace(/[áàäâ]/g, 'a')
+                .replace(/[éèëê]/g, 'e')
+                .replace(/[íìïî]/g, 'i')
+                .replace(/[óòöô]/g, 'o')
+                .replace(/[úùüû]/g, 'u');
+            
+            if (text.includes('enroque corto')) {
+                attemptMove('O-O');
+                return;
+            }
+            if (text.includes('enroque largo')) {
+                attemptMove('O-O-O');
+                return;
+            }
+            
+            let promotion = null;
+            if (text.includes('corona a dama')) promotion = 'q';
+            else if (text.includes('corona a torre')) promotion = 'r';
+            else if (text.includes('corona a alfil')) promotion = 'b';
+            else if (text.includes('corona a caballo')) promotion = 'n';
+            
+            const move = parseVoiceMove(text, promotion);
+            if (move) {
+                attemptMove(move);
+            } else {
+                speak('No entendí el movimiento. Repite por favor.');
+                setTimeout(() => { waitingForMove = true; }, 2000);
+            }
+        }
+
+        function parseVoiceMove(text, promotion) {
+            const letterMap = {
+                'a': 'a', 'be': 'b', 'ce': 'c', 'de': 'd',
+                'e': 'e', 'efe': 'f', 'ge': 'g', 'hache': 'h'
+            };
+            const numberMap = {
+                'uno': '1', 'dos': '2', 'tres': '3', 'cuatro': '4',
+                'cinco': '5', 'seis': '6', 'siete': '7', 'ocho': '8',
+                '1': '1', '2': '2', '3': '3', '4': '4',
+                '5': '5', '6': '6', '7': '7', '8': '8'
+            };
+            const pieceMap = {
+                'peon': '', 'torre': 'R', 'caballo': 'N',
+                'alfil': 'B', 'dama': 'Q', 'rey': 'K'
+            };
+            
+            let piece = '';
+            for (const [name, symbol] of Object.entries(pieceMap)) {
+                if (text.includes(name)) {
+                    piece = symbol;
+                    break;
+                }
+            }
+            
+            const isCapture = text.includes('por') || text.includes('captura') || text.includes('come');
+            let file = null;
+            let rank = null;
+            
+            const words = text.split(/\s+/);
+            for (let i = 0; i < words.length; i++) {
+                if (letterMap[words[i]] && !file) {
+                    file = letterMap[words[i]];
+                    if (i + 1 < words.length && numberMap[words[i + 1]]) {
+                        rank = numberMap[words[i + 1]];
+                        break;
+                    }
+                }
+            }
+            
+            const squareMatch = text.match(/([a-h])(\d)/);
+            if (squareMatch && !file) {
+                file = squareMatch[1];
+                rank = squareMatch[2];
+            }
+            
+            if (!file || !rank) return null;
+            
+            const square = file + rank;
+            let moveStr = piece + (isCapture ? 'x' : '') + square;
+            if (promotion) moveStr += '=' + promotion.toUpperCase();
+            
+            return moveStr;
+        }
+
+        function speak(text, save = true) {
+            if (save) lastSpokenText = text;
+            elements.spokenText.textContent = text;
+            synthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-ES';
+            utterance.rate = 0.9;
+            
+            const voices = synthesis.getVoices();
+            const spanishVoice = voices.find(v => v.lang.startsWith('es'));
+            if (spanishVoice) utterance.voice = spanishVoice;
+            
+            synthesis.speak(utterance);
+        }
+
+        function getMoveAnnouncement(move) {
+            if (move.san === 'O-O') return 'enroque corto';
+            if (move.san === 'O-O-O') return 'enroque largo';
+            
+            let announcement = '';
+            const pieceName = config.pieceNames[move.piece] || '';
+            
+            if (pieceName && pieceName !== 'peón') {
+                announcement += pieceName.charAt(0).toUpperCase() + pieceName.slice(1) + ' ';
+            } else if (pieceName === 'peón') {
+                announcement += 'Peón ';
+            }
+            
+            if (move.captured) {
+                announcement += 'captura en ';
+            } else {
+                announcement += 'a ';
+            }
+            
+            announcement += move.to;
+            
+            if (move.promotion) {
+                announcement += `, corona a ${config.pieceNames[move.promotion]}`;
+            }
+            
+            if (game.in_checkmate()) {
+                announcement += '. Jaque mate';
+            } else if (game.in_check()) {
+                announcement += '. Jaque';
+            }
+            
+            return announcement;
+        }
+
+        function attemptMove(moveStr) {
+            if (game.game_over()) {
+                speak('La partida ha terminado');
+                return;
+            }
+            
+            if (game.turn() !== playerColor) {
+                speak('No es tu turno');
+                setTimeout(() => { waitingForMove = true; }, 1500);
+                return;
+            }
+            
+            try {
+                const move = game.move(moveStr, { sloppy: true });
+                if (move) {
+                    speak(`Tu movimiento: ${getMoveAnnouncement(move)}`);
+                    renderBoard();
+                    updateUI();
+                    checkGameEnd();
+                    
+                    if (!game.game_over() && game.turn() !== playerColor) {
+                        setTimeout(requestAIMove, 800);
+                    }
+                } else {
+                    speak('Movimiento ilegal. Intenta de nuevo.');
+                    setTimeout(() => { waitingForMove = true; }, 2000);
+                }
+            } catch (error) {
+                speak('Movimiento ilegal. Intenta de nuevo.');
+                setTimeout(() => { waitingForMove = true; }, 2000);
+            }
+        }
+
+        function requestAIMove() {
+            if (isThinking || game.game_over()) return;
+            isThinking = true;
+            speak('Pensando...');
+            
+            setTimeout(() => {
+                const move = ChessEngine.getBestMove(game, currentLevel);
+                if (move) {
+                    game.move(move);
+                    speak(`Mi movimiento: ${getMoveAnnouncement(move)}`);
+                    renderBoard();
+                    updateUI();
+                    checkGameEnd();
+                }
+                isThinking = false;
+                
+                if (!game.game_over() && voiceActive) {
+                    setTimeout(() => {
+                        waitingForMove = true;
+                        speak('Tu turno', false);
+                    }, 1500);
+                }
+            }, 500);
+        }
+
+        function makeMove(from, to, promotion = 'q') {
+            const move = game.move({ from, to, promotion });
+            if (move) {
+                speak(`Tu movimiento: ${getMoveAnnouncement(move)}`);
+                renderBoard();
+                updateUI();
+                checkGameEnd();
+                
+                if (!game.game_over() && game.turn() !== playerColor) {
+                    setTimeout(requestAIMove, 800);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        function renderBoard() {
+            elements.board.innerHTML = '';
+            
+            for (let rank = 8; rank >= 1; rank--) {
+                for (let file = 0; file < 8; file++) {
+                    const square = String.fromCharCode(97 + file) + rank;
+                    const squareEl = document.createElement('div');
+                    squareEl.className = 'square';
+                    squareEl.dataset.square = square;
+                    
+                    const isLight = (file + rank) % 2 === 0;
+                    squareEl.classList.add(isLight ? 'light' : 'dark');
+                    
+                    const piece = game.get(square);
+                    if (piece) {
+                        const symbol = config.pieceSymbols[piece.type.toUpperCase()];
+                        const coloredSymbol = piece.color === 'w' ? symbol : config.pieceSymbols[piece.type];
+                        squareEl.textContent = coloredSymbol;
+                    }
+                    
+                    if (file === 7) {
+                        const rankLabel = document.createElement('span');
+                        rankLabel.className = 'coord rank';
+                        rankLabel.textContent = rank;
+                        squareEl.appendChild(rankLabel);
+                    }
+                    if (rank === 1) {
+                        const fileLabel = document.createElement('span');
+                        fileLabel.className = 'coord file';
+                        fileLabel.textContent = String.fromCharCode(97 + file);
+                        squareEl.appendChild(fileLabel);
+                    }
+                    
+                    if (selectedSquare === square) {
+                        squareEl.classList.add('selected');
+                    }
+                    
+                    const history = game.history({ verbose: true });
+                    if (history.length > 0) {
+                        const lastMove = history[history.length - 1];
+                        if (square === lastMove.from || square === lastMove.to) {
+                            squareEl.classList.add('last-move');
+                        }
+                    }
+                    
+                    squareEl.addEventListener('click', () => handleSquareClick(square));
+                    elements.board.appendChild(squareEl);
+                }
+            }
+        }
+
+        function handleSquareClick(square) {
+            if (game.turn() !== playerColor || game.game_over()) return;
+            
+            if (!selectedSquare) {
+                const piece = game.get(square);
+                if (piece && piece.color === playerColor) {
+                    selectedSquare = square;
+                    renderBoard();
+                }
+            } else {
+                if (square === selectedSquare) {
+                    selectedSquare = null;
+                    renderBoard();
+                } else {
+                    const piece = game.get(selectedSquare);
+                    if (piece && piece.type === 'p' &&
+                        ((piece.color === 'w' && square[1] === '8') ||
+                         (piece.color === 'b' && square[1] === '1'))) {
+                        pendingPromotion = { from: selectedSquare, to: square };
+                        showPromotionModal();
+                    } else {
+                        makeMove(selectedSquare, square);
+                    }
+                    selectedSquare = null;
+                }
+            }
+        }
+
+        function showPromotionModal() {
+            const modal = document.getElementById('promotion-modal');
+            modal.classList.add('active');
+            
+            const pieces = modal.querySelectorAll('.promotion-piece');
+            pieces.forEach(piece => {
+                piece.onclick = () => {
+                    if (pendingPromotion) {
+                        makeMove(pendingPromotion.from, pendingPromotion.to, piece.dataset.piece);
+                        pendingPromotion = null;
+                    }
+                    modal.classList.remove('active');
+                };
+            });
+        }
+
+        function updateUI() {
+            const turn = game.turn() === 'w' ? 'blancas' : 'negras';
+            elements.turnIndicator.textContent = `Turno de las ${turn}`;
+            
+            const history = game.history({ verbose: true });
+            if (history.length > 0) {
+                elements.lastMove.textContent = `Última jugada: ${history[history.length - 1].san}`;
+            }
+            
+            elements.moveHistory.textContent = game.pgn();
+            elements.fenDisplay.textContent = game.fen();
+        }
+
+        function checkGameEnd() {
+            if (game.in_checkmate()) {
+                const winner = game.turn() === 'w' ? 'negras' : 'blancas';
+                speak(`Jaque mate. Ganan las ${winner}.`);
+                stopVoiceRecognition();
+            } else if (game.in_draw()) {
+                speak('Tablas');
+                stopVoiceRecognition();
+            } else if (game.in_check()) {
+                speak('Jaque');
+            }
+        }
+
+        function toggleBoard() {
+            boardVisible = !boardVisible;
+            if (boardVisible) {
+                elements.boardContainer.classList.remove('hidden');
+                elements.toggleBoardBtn.innerHTML = '👁️ Ocultar';
+            } else {
+                elements.boardContainer.classList.add('hidden');
+                elements.toggleBoardBtn.innerHTML = '👁️ Mostrar';
+            }
+        }
+
+        function newGame() {
+            if (confirm('¿Iniciar nueva partida?')) {
+                game.reset();
+                selectedSquare = null;
+                isThinking = false;
+                waitingForMove = voiceActive;
+                renderBoard();
+                updateUI();
+                speak('Nueva partida. Juegan las blancas.');
+            }
+        }
+
+        function undoMove() {
+            if (game.history().length < 2) {
+                speak('No hay movimientos para deshacer');
+                return;
+            }
+            game.undo();
+            game.undo();
+            renderBoard();
+            updateUI();
+            speak('Movimientos deshechos');
+            if (voiceActive) {
+                waitingForMove = true;
+            }
+        }
+
+        function resign() {
+            if (confirm('¿Rendirse?')) {
+                const winner = game.turn() === 'w' ? 'negras' : 'blancas';
+                speak(`Te rindes. Ganan las ${winner}.`);
+                stopVoiceRecognition();
+            }
+        }
+
+        function offerDraw() {
+            if (confirm('¿Ofrecer tablas?')) {
+                speak('Tablas acordadas');
+                stopVoiceRecognition();
+            }
+        }
+
+        function setupEventListeners() {
+            elements.listenBtn.addEventListener('click', toggleVoiceRecognition);
+            elements.repeatBtn.addEventListener('click', () => speak(lastSpokenText, false));
+            elements.toggleBoardBtn.addEventListener('click', toggleBoard);
+            elements.newGameBtn.addEventListener('click', newGame);
+            elements.undoBtn.addEventListener('click', undoMove);
+            elements.resignBtn.addEventListener('click', resign);
+            elements.drawBtn.addEventListener('click', offerDraw);
+            elements.helpBtn.addEventListener('click', () => openModal('help-modal'));
+            
+            elements.moveInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const move = elements.moveInput.value.trim();
+                    if (move) {
+                        attemptMove(move);
+                        elements.moveInput.value = '';
+                    }
+                }
+            });
+            
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentLevel = parseInt(this.dataset.level);
+                    speak(`Nivel ${this.textContent.replace(/[^a-zA-Záéíóú\s]/g, '')}`);
+                });
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                switch(e.key.toLowerCase()) {
+                    case 'n': newGame(); break;
+                    case 'm': toggleBoard(); break;
+                    case 'e': toggleVoiceRecognition(); break;
+                    case 'r': speak(lastSpokenText, false); break;
+                    case 'h': openModal('help-modal'); break;
+                }
+            });
+            
+            if (synthesis.onvoiceschanged !== undefined) {
+                synthesis.onvoiceschanged = () => synthesis.getVoices();
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.classList.remove('active');
+            });
+        });
+
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
