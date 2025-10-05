@@ -38,22 +38,24 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.15) 0%, rgba(0, 78, 137, 0.15) 100%);
+            backdrop-filter: blur(15px);
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             padding: 25px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         h1 {
             text-align: center;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            background: linear-gradient(135deg, #FF6B35, #FFD166, #06D6A0, #0077B6, #004E89);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 20px;
             font-size: 32px;
             font-weight: 800;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .level-selector {
@@ -69,7 +71,7 @@
             min-width: 80px;
             padding: 12px;
             border: 3px solid transparent;
-            background: linear-gradient(white, white) padding-box,
+            background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)) padding-box,
                         linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) border-box;
             color: var(--dark);
             border-radius: 12px;
@@ -87,12 +89,14 @@
         }
 
         .game-status {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(0, 78, 137, 0.1));
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.25), rgba(0, 78, 137, 0.25));
+            backdrop-filter: blur(10px);
             padding: 20px;
             border-radius: 15px;
             margin-bottom: 20px;
             text-align: center;
-            border: 2px solid rgba(255, 107, 53, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
         .game-status h2 {
@@ -102,23 +106,29 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            font-weight: 800;
         }
 
         .game-status p {
             font-size: 16px;
             color: var(--dark);
             margin: 8px 0;
+            font-weight: 600;
         }
 
         #spoken-text {
-            background: white;
-            padding: 12px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.85));
+            padding: 15px;
             border-left: 5px solid var(--primary);
             margin-top: 12px;
             font-style: italic;
-            min-height: 50px;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            min-height: 60px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         #board-container {
@@ -275,19 +285,25 @@
         }
 
         #listen-btn.listening {
-            background: linear-gradient(135deg, #EF476F, #C1184A);
-            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #06D6A0, #048861);
+            animation: pulse 2s infinite ease-in-out;
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(239, 71, 111, 0.4); }
-            50% { transform: scale(1.05); box-shadow: 0 6px 25px rgba(239, 71, 111, 0.6); }
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 4px 15px rgba(6, 214, 160, 0.4); 
+            }
+            50% { 
+                transform: scale(1.03); 
+                box-shadow: 0 6px 30px rgba(6, 214, 160, 0.6); 
+            }
         }
 
         #move-input {
             padding: 15px;
             border: 3px solid transparent;
-            background: linear-gradient(white, white) padding-box,
+            background: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)) padding-box,
                         linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) border-box;
             border-radius: 12px;
             font-size: 16px;
@@ -298,17 +314,19 @@
 
         #move-input:focus {
             outline: none;
-            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 0 25px rgba(255, 107, 53, 0.4);
         }
 
         #history-container {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(0, 78, 137, 0.05));
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.2), rgba(0, 78, 137, 0.2));
+            backdrop-filter: blur(10px);
             padding: 20px;
             border-radius: 15px;
             margin-top: 20px;
             max-height: 250px;
             overflow-y: auto;
-            border: 2px solid rgba(0, 78, 137, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
         #history-container h3 {
@@ -318,6 +336,7 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            font-weight: 800;
         }
 
         #move-history {
@@ -325,6 +344,7 @@
             font-size: 14px;
             white-space: pre-wrap;
             color: var(--dark);
+            font-weight: 600;
         }
 
         .modal {
@@ -347,7 +367,7 @@
         }
 
         .modal-content {
-            background: white;
+            background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
             padding: 30px;
             border-radius: 20px;
             max-width: 500px;
@@ -355,6 +375,7 @@
             max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 25px 70px rgba(0,0,0,0.5);
+            border: 2px solid rgba(255, 107, 53, 0.3);
         }
 
         .modal-content h2 {
@@ -382,7 +403,7 @@
             font-size: 52px;
             text-align: center;
             border: 4px solid transparent;
-            background: linear-gradient(white, white) padding-box,
+            background: linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95)) padding-box,
                         linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) border-box;
             border-radius: 15px;
             cursor: pointer;
@@ -395,17 +416,36 @@
         }
 
         .alert-box {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 152, 0, 0.2));
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 152, 0, 0.3));
+            backdrop-filter: blur(10px);
             border-left: 5px solid #FF9800;
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 10px;
             font-size: 14px;
             display: none;
+            border: 2px solid rgba(255, 152, 0, 0.4);
         }
 
         .alert-box.show {
             display: block;
+        }
+
+        .voice-status {
+            text-align: center;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            display: none;
+        }
+
+        .voice-status.active {
+            display: block;
+            background: linear-gradient(135deg, rgba(6, 214, 160, 0.3), rgba(4, 136, 97, 0.3));
+            border: 2px solid rgba(6, 214, 160, 0.5);
+            color: #048861;
         }
 
         @media (max-width: 600px) {
@@ -427,7 +467,6 @@
             }
         }
 
-        /* Scrollbar personalizado */
         ::-webkit-scrollbar {
             width: 10px;
         }
@@ -465,6 +504,10 @@
             <div id="spoken-text" role="status" aria-live="polite">Presiona "Activar Voz" para comenzar</div>
         </div>
 
+        <div class="voice-status" id="voice-status">
+            🎤 Micrófono activo - Habla cuando estés listo
+        </div>
+
         <div class="voice-controls">
             <button id="listen-btn" class="btn btn-success">
                 <span>🎤</span>
@@ -493,7 +536,7 @@
         <div id="history-container">
             <h3>📋 Historial de movimientos</h3>
             <div id="move-history"></div>
-            <p style="margin-top: 12px; font-size: 13px; opacity: 0.7;"><strong>FEN:</strong> <span id="fen-display"></span></p>
+            <p style="margin-top: 12px; font-size: 13px; opacity: 0.8; font-weight: 600;"><strong>FEN:</strong> <span id="fen-display"></span></p>
         </div>
     </div>
 
@@ -512,21 +555,12 @@
                 <li>Letras: a, be, ce, de, e, efe, ge, hache</li>
                 <li>Números: uno, dos, tres, cuatro, cinco, seis, siete, ocho</li>
             </ul>
-            <h3>⌨️ Atajos de teclado:</h3>
+            <h3>💡 Consejos para mejor reconocimiento:</h3>
             <ul>
-                <li><strong>N:</strong> Nueva partida</li>
-                <li><strong>M:</strong> Mostrar/Ocultar tablero</li>
-                <li><strong>E:</strong> Activar voz</li>
-                <li><strong>R:</strong> Repetir locución</li>
-                <li><strong>H:</strong> Ayuda</li>
-            </ul>
-            <h3>📱 Problemas con el micrófono en Android:</h3>
-            <ul>
-                <li>1. Abre Chrome en tu móvil</li>
-                <li>2. Toca los 3 puntos (⋮) arriba a la derecha</li>
-                <li>3. Configuración → Configuración de sitios</li>
-                <li>4. Micrófono → Activar "Preguntar primero"</li>
-                <li>5. Recarga esta página</li>
+                <li>Habla claro y pausado</li>
+                <li>Di todo el movimiento completo: "caballo a efe tres"</li>
+                <li>Espera a que termine de hablar antes de responder</li>
+                <li>Tómate tu tiempo - el micrófono estará activo hasta que hables</li>
             </ul>
             <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">Cerrar</button>
         </div>
@@ -633,7 +667,6 @@
             }
         };
 
-        // CONFIGURACIÓN
         const config = {
             pieceSymbols: {
                 'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
@@ -645,7 +678,6 @@
             }
         };
 
-        // ESTADO
         let game = new Chess();
         let recognition = null;
         let synthesis = window.speechSynthesis;
@@ -659,8 +691,9 @@
         let voiceActive = false;
         let waitingForMove = false;
         let permissionDenied = false;
+        let isSpeaking = false;
+        let recognitionTimeout = null;
 
-        // ELEMENTOS DOM
         const elements = {
             board: document.getElementById('board'),
             boardContainer: document.getElementById('board-container'),
@@ -679,13 +712,13 @@
             resignBtn: document.getElementById('resign-btn'),
             drawBtn: document.getElementById('draw-btn'),
             helpBtn: document.getElementById('help-btn'),
-            permissionAlert: document.getElementById('permission-alert')
+            permissionAlert: document.getElementById('permission-alert'),
+            voiceStatus: document.getElementById('voice-status')
         };
 
         function init() {
             console.log('Inicializando ajedrez a ciegas...');
             
-            // Detectar Android
             const isAndroid = /Android/i.test(navigator.userAgent);
             if (isAndroid) {
                 elements.permissionAlert.classList.add('show');
@@ -711,50 +744,65 @@
             recognition = new SpeechRecognition();
             recognition.lang = 'es-ES';
             recognition.continuous = true;
-            recognition.interimResults = false;
-            recognition.maxAlternatives = 1;
+            recognition.interimResults = true; // MEJORADO: Detecta palabras mientras hablas
+            recognition.maxAlternatives = 3; // MEJORADO: Considera varias alternativas
             
             recognition.onstart = () => {
-                console.log('✅ Reconocimiento iniciado correctamente');
+                console.log('✅ Reconocimiento iniciado');
                 permissionDenied = false;
                 elements.listenBtn.classList.add('listening');
                 elements.listenText.textContent = 'Escuchando...';
                 elements.permissionAlert.classList.remove('show');
+                elements.voiceStatus.classList.add('active');
             };
             
             recognition.onresult = (event) => {
-                if (!waitingForMove) return;
+                // Limpiar timeout anterior
+                if (recognitionTimeout) {
+                    clearTimeout(recognitionTimeout);
+                }
+                
                 const lastResultIndex = event.results.length - 1;
-                const transcript = event.results[lastResultIndex][0].transcript.toLowerCase();
-                console.log('🎤 Voz capturada:', transcript);
-                elements.spokenText.textContent = `Escuchado: "${transcript}"`;
-                waitingForMove = false;
-                processVoiceMove(transcript);
+                const result = event.results[lastResultIndex];
+                
+                // Si es resultado final y estamos esperando movimiento
+                if (result.isFinal && waitingForMove && !isSpeaking) {
+                    const transcript = result[0].transcript.toLowerCase();
+                    console.log('🎤 Voz capturada (final):', transcript);
+                    elements.spokenText.textContent = `Escuchado: "${transcript}"`;
+                    
+                    waitingForMove = false;
+                    processVoiceMove(transcript);
+                } else if (result.isFinal) {
+                    // Mostrar lo que se detectó aunque no se procese
+                    console.log('🎤 Voz detectada (ignorada - no es tu turno):', result[0].transcript);
+                }
+                
+                // Resetear el estado de escucha cada vez que detecta algo
+                // para que no expire tan rápido
+                if (voiceActive) {
+                    recognitionTimeout = setTimeout(() => {
+                        console.log('⏰ Timeout de escucha - reiniciando');
+                    }, 30000); // 30 segundos de silencio antes de timeout
+                }
             };
             
             recognition.onerror = (event) => {
-                console.error('❌ Error de reconocimiento:', event.error);
+                console.error('❌ Error:', event.error);
                 
                 if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
                     permissionDenied = true;
                     stopVoiceRecognition();
                     elements.permissionAlert.classList.add('show');
-                    
-                    alert('🚫 PERMISO DE MICRÓFONO DENEGADO\n\n' +
-                          '📱 Para ANDROID, sigue estos pasos:\n\n' +
-                          '1. Toca los 3 puntos (⋮) en Chrome\n' +
-                          '2. Configuración\n' +
-                          '3. Configuración de sitios\n' +
-                          '4. Micrófono\n' +
-                          '5. Activa "Preguntar primero"\n' +
-                          '6. Recarga esta página\n\n' +
-                          'O usa la entrada manual escribiendo los movimientos.');
+                    alert('🚫 PERMISO DE MICRÓFONO DENEGADO\n\nVe a: Chrome ⋮ → Configuración → Configuración de sitios → Micrófono → Permitir');
                 } else if (event.error === 'no-speech') {
-                    console.log('⚠️ No se detectó voz, continuando...');
+                    console.log('⚠️ No se detectó voz (normal si hay silencio)');
                 } else if (event.error === 'audio-capture') {
                     permissionDenied = true;
                     stopVoiceRecognition();
-                    alert('❌ No se puede acceder al micrófono.\n\nVerifica:\n• Micrófono conectado\n• Permisos en Configuración > Apps > Chrome');
+                    alert('❌ No se puede acceder al micrófono.\n\nVerifica: Micrófono conectado y permisos en Configuración');
+                } else if (event.error === 'network') {
+                    console.warn('⚠️ Error de red - continuando...');
                 } else {
                     console.warn('⚠️ Error:', event.error);
                 }
@@ -762,25 +810,32 @@
             
             recognition.onend = () => {
                 console.log('🔄 Reconocimiento finalizado');
-                if (voiceActive && !game.game_over() && !permissionDenied) {
-                    console.log('Reiniciando reconocimiento...');
+                
+                // Limpiar timeout
+                if (recognitionTimeout) {
+                    clearTimeout(recognitionTimeout);
+                }
+                
+                // Reiniciar si sigue activo y no hay errores
+                if (voiceActive && !game.game_over() && !permissionDenied && !isSpeaking) {
                     setTimeout(() => {
                         try {
                             recognition.start();
                         } catch (e) {
-                            console.log('No se puede reiniciar:', e);
+                            console.log('No se puede reiniciar (probablemente ya está activo):', e);
                         }
-                    }, 300);
+                    }, 100);
                 } else {
                     elements.listenBtn.classList.remove('listening');
                     elements.listenText.textContent = 'Activar Voz';
+                    elements.voiceStatus.classList.remove('active');
                 }
             };
         }
 
         function toggleVoiceRecognition() {
             if (!recognition) {
-                alert('❌ Reconocimiento de voz no disponible.\n\nUsa Chrome o Edge en Android.\n\nO escribe los movimientos manualmente.');
+                alert('❌ Reconocimiento de voz no disponible.\n\nUsa Chrome o Edge en Android.');
                 return;
             }
             
@@ -794,18 +849,15 @@
         function startVoiceRecognition() {
             if (voiceActive) return;
             voiceActive = true;
-            waitingForMove = true;
+            waitingForMove = game.turn() === playerColor;
             permissionDenied = false;
             
             try {
                 recognition.start();
-                speak('Reconocimiento de voz activado. Di tu movimiento cuando sea tu turno.', false);
+                speak('Reconocimiento de voz activado. Tómate tu tiempo para pensar y habla cuando estés listo.', false);
             } catch (error) {
                 console.error('Error al iniciar:', error);
                 voiceActive = false;
-                if (error.name === 'InvalidStateError') {
-                    console.log('El reconocimiento ya estaba activo');
-                }
             }
         }
 
@@ -813,6 +865,10 @@
             if (!voiceActive) return;
             voiceActive = false;
             waitingForMove = false;
+            
+            if (recognitionTimeout) {
+                clearTimeout(recognitionTimeout);
+            }
             
             try {
                 recognition.stop();
@@ -822,55 +878,80 @@
             
             elements.listenBtn.classList.remove('listening');
             elements.listenText.textContent = 'Activar Voz';
+            elements.voiceStatus.classList.remove('active');
             speak('Reconocimiento de voz desactivado.', false);
         }
 
         function processVoiceMove(text) {
+            // Normalizar texto mejorado
             text = text.toLowerCase()
+                .trim()
                 .replace(/[áàäâ]/g, 'a')
                 .replace(/[éèëê]/g, 'e')
                 .replace(/[íìïî]/g, 'i')
                 .replace(/[óòöô]/g, 'o')
-                .replace(/[úùüû]/g, 'u');
+                .replace(/[úùüû]/g, 'u')
+                .replace(/\s+/g, ' '); // Múltiples espacios a uno solo
             
-            if (text.includes('enroque corto')) {
+            console.log('Procesando:', text);
+            
+            // Enroques
+            if (text.includes('enroque corto') || text.includes('enroque rey') || text.includes('enroque de rey')) {
                 attemptMove('O-O');
                 return;
             }
-            if (text.includes('enroque largo')) {
+            if (text.includes('enroque largo') || text.includes('enroque dama') || text.includes('enroque de dama')) {
                 attemptMove('O-O-O');
                 return;
             }
             
+            // Promoción
             let promotion = null;
-            if (text.includes('corona a dama')) promotion = 'q';
-            else if (text.includes('corona a torre')) promotion = 'r';
-            else if (text.includes('corona a alfil')) promotion = 'b';
-            else if (text.includes('corona a caballo')) promotion = 'n';
+            if (text.includes('corona a dama') || text.includes('promociona a dama') || text.includes('coronar dama')) {
+                promotion = 'q';
+            } else if (text.includes('corona a torre') || text.includes('coronar torre')) {
+                promotion = 'r';
+            } else if (text.includes('corona a alfil') || text.includes('coronar alfil')) {
+                promotion = 'b';
+            } else if (text.includes('corona a caballo') || text.includes('coronar caballo')) {
+                promotion = 'n';
+            }
             
             const move = parseVoiceMove(text, promotion);
             if (move) {
                 attemptMove(move);
             } else {
-                speak('No entendí el movimiento. Repite por favor.');
-                setTimeout(() => { waitingForMove = true; }, 2000);
+                speak('No entendí tu movimiento. Por favor, repítelo claramente. Por ejemplo: caballo a efe tres.', false);
+                // Reactivar escucha después de un tiempo
+                setTimeout(() => { 
+                    if (voiceActive) {
+                        waitingForMove = true;
+                        elements.spokenText.textContent = 'Estoy escuchando... Habla cuando estés listo';
+                    }
+                }, 3000);
             }
         }
 
         function parseVoiceMove(text, promotion) {
             const letterMap = {
                 'a': 'a', 'be': 'b', 'ce': 'c', 'de': 'd',
-                'e': 'e', 'efe': 'f', 'ge': 'g', 'hache': 'h'
+                'e': 'e', 'efe': 'f', 'ge': 'g', 'hache': 'h',
+                // Alternativas comunes
+                'b': 'b', 'c': 'c', 'd': 'd', 'f': 'f', 'g': 'g', 'h': 'h'
             };
             const numberMap = {
                 'uno': '1', 'dos': '2', 'tres': '3', 'cuatro': '4',
                 'cinco': '5', 'seis': '6', 'siete': '7', 'ocho': '8',
                 '1': '1', '2': '2', '3': '3', '4': '4',
-                '5': '5', '6': '6', '7': '7', '8': '8'
+                '5': '5', '6': '6', '7': '7', '8': '8',
+                'un': '1', // Alternativa
             };
             const pieceMap = {
                 'peon': '', 'torre': 'R', 'caballo': 'N',
-                'alfil': 'B', 'dama': 'Q', 'rey': 'K'
+                'alfil': 'B', 'dama': 'Q', 'rey': 'K',
+                // Sinónimos
+                'caballo': 'N', 'caballos': 'N',
+                'alfil': 'B', 'alfiles': 'B'
             };
             
             let piece = '';
@@ -881,14 +962,17 @@
                 }
             }
             
-            const isCapture = text.includes('por') || text.includes('captura') || text.includes('come');
+            const isCapture = text.includes(' por ') || text.includes(' come ') || text.includes(' captura ') || text.includes(' x ');
+            
             let file = null;
             let rank = null;
             
+            // Buscar patrón letra-número
             const words = text.split(/\s+/);
             for (let i = 0; i < words.length; i++) {
                 if (letterMap[words[i]] && !file) {
                     file = letterMap[words[i]];
+                    // Buscar número después
                     if (i + 1 < words.length && numberMap[words[i + 1]]) {
                         rank = numberMap[words[i + 1]];
                         break;
@@ -896,33 +980,55 @@
                 }
             }
             
+            // Buscar patrón e4, f3, etc.
             const squareMatch = text.match(/([a-h])(\d)/);
             if (squareMatch && !file) {
                 file = squareMatch[1];
                 rank = squareMatch[2];
             }
             
-            if (!file || !rank) return null;
+            if (!file || !rank) {
+                console.log('No se pudo parsear:', text);
+                return null;
+            }
             
             const square = file + rank;
             let moveStr = piece + (isCapture ? 'x' : '') + square;
             if (promotion) moveStr += '=' + promotion.toUpperCase();
             
+            console.log('Movimiento parseado:', moveStr);
             return moveStr;
         }
 
         function speak(text, save = true) {
             if (save) lastSpokenText = text;
+            
             elements.spokenText.textContent = text;
             synthesis.cancel();
             
+            isSpeaking = true;
+            
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-ES';
-            utterance.rate = 0.9;
+            utterance.rate = 0.85; // Más despacio para mejor comprensión
+            utterance.pitch = 1;
             
             const voices = synthesis.getVoices();
             const spanishVoice = voices.find(v => v.lang.startsWith('es'));
             if (spanishVoice) utterance.voice = spanishVoice;
+            
+            utterance.onend = () => {
+                isSpeaking = false;
+                console.log('Terminó de hablar');
+                // Activar escucha solo después de terminar de hablar
+                if (voiceActive && game.turn() === playerColor && !game.game_over()) {
+                    setTimeout(() => {
+                        waitingForMove = true;
+                        elements.spokenText.textContent = 'Tu turno - Habla cuando estés listo';
+                        console.log('Esperando tu movimiento...');
+                    }, 500); // Medio segundo de pausa antes de activar escucha
+                }
+            };
             
             synthesis.speak(utterance);
         }
@@ -968,8 +1074,7 @@
             }
             
             if (game.turn() !== playerColor) {
-                speak('No es tu turno');
-                setTimeout(() => { waitingForMove = true; }, 1500);
+                speak('No es tu turno. Espera a que juegue la computadora.');
                 return;
             }
             
@@ -982,21 +1087,33 @@
                     checkGameEnd();
                     
                     if (!game.game_over() && game.turn() !== playerColor) {
-                        setTimeout(requestAIMove, 800);
+                        waitingForMove = false;
+                        setTimeout(requestAIMove, 1200); // Más tiempo antes de que juegue la IA
                     }
                 } else {
-                    speak('Movimiento ilegal. Intenta de nuevo.');
-                    setTimeout(() => { waitingForMove = true; }, 2000);
+                    speak('Movimiento ilegal. Por favor, intenta de nuevo.');
+                    setTimeout(() => { 
+                        if (voiceActive) {
+                            waitingForMove = true;
+                            elements.spokenText.textContent = 'Habla cuando estés listo';
+                        }
+                    }, 2500);
                 }
             } catch (error) {
-                speak('Movimiento ilegal. Intenta de nuevo.');
-                setTimeout(() => { waitingForMove = true; }, 2000);
+                speak('Movimiento ilegal. Por favor, intenta de nuevo.');
+                setTimeout(() => { 
+                    if (voiceActive) {
+                        waitingForMove = true;
+                        elements.spokenText.textContent = 'Habla cuando estés listo';
+                    }
+                }, 2500);
             }
         }
 
         function requestAIMove() {
             if (isThinking || game.game_over()) return;
             isThinking = true;
+            waitingForMove = false;
             speak('Pensando...');
             
             setTimeout(() => {
@@ -1010,13 +1127,12 @@
                 }
                 isThinking = false;
                 
+                // No reactivar escucha inmediatamente, dejar que el usuario piense
                 if (!game.game_over() && voiceActive) {
-                    setTimeout(() => {
-                        waitingForMove = true;
-                        speak('Tu turno', false);
-                    }, 1500);
+                    // La escucha se reactiva cuando termine de hablar (en utterance.onend)
+                    console.log('Esperando a que termine de anunciar movimiento...');
                 }
-            }, 500);
+            }, 800);
         }
 
         function makeMove(from, to, promotion = 'q') {
@@ -1028,7 +1144,8 @@
                 checkGameEnd();
                 
                 if (!game.game_over() && game.turn() !== playerColor) {
-                    setTimeout(requestAIMove, 800);
+                    waitingForMove = false;
+                    setTimeout(requestAIMove, 1200);
                 }
                 return true;
             }
@@ -1152,7 +1269,10 @@
                 speak('Tablas');
                 stopVoiceRecognition();
             } else if (game.in_check()) {
-                speak('Jaque');
+                // No anunciar jaque cada vez, solo en casos importantes
+                if (Math.random() > 0.5) {
+                    speak('Jaque', false);
+                }
             }
         }
 
@@ -1188,9 +1308,12 @@
             game.undo();
             renderBoard();
             updateUI();
-            speak('Movimientos deshechos');
+            speak('Movimientos deshechos. Es tu turno.');
             if (voiceActive) {
-                waitingForMove = true;
+                setTimeout(() => {
+                    waitingForMove = true;
+                    elements.spokenText.textContent = 'Habla cuando estés listo';
+                }, 1500);
             }
         }
 
@@ -1234,7 +1357,7 @@
                     document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     currentLevel = parseInt(this.dataset.level);
-                    speak(`Nivel ${this.textContent.replace(/[^a-zA-Záéíóú\s]/g, '')}`);
+                    speak(`Nivel ${this.textContent.replace(/[^a-zA-Záéíóú\s]/g, '')}`, false);
                 });
             });
             
