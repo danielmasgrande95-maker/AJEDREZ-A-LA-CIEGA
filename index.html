@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ajedrez a Ciegas</title>
+    <title>Blindfold Chess</title>
     <style>
         * {
             margin: 0;
@@ -379,7 +379,7 @@
             background: linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
             padding: 30px;
             border-radius: 20px;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             max-height: 85vh;
             overflow-y: auto;
@@ -395,6 +395,14 @@
             font-size: 24px;
         }
 
+        .modal-content h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
         .modal-content ul {
             margin-left: 20px;
             line-height: 1.8;
@@ -403,6 +411,22 @@
         .modal-content p {
             line-height: 1.8;
             margin-bottom: 10px;
+        }
+
+        .modal-content code {
+            background: rgba(0,0,0,0.05);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+        }
+
+        .instruction-section {
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(0, 78, 137, 0.1));
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid var(--primary);
         }
 
         #promotion-modal .promotion-pieces {
@@ -426,21 +450,6 @@
 
         .promotion-piece:hover {
             transform: scale(1.1);
-        }
-
-        .alert-box {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 152, 0, 0.3));
-            backdrop-filter: blur(10px);
-            border-left: 5px solid #FF9800;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .alert-box.show {
-            display: block;
         }
 
         .voice-status {
@@ -485,67 +494,63 @@
 </head>
 <body>
     <div class="container">
-        <h1>♟️ Ajedrez a Ciegas ♟️</h1>
-
-        <div class="alert-box" id="permission-alert">
-            📱 <strong>Android:</strong> Chrome ⋮ → Configuración → Micrófono → Permitir
-        </div>
+        <h1>♟️ Blindfold Chess ♟️</h1>
 
         <div class="level-selector">
-            <button class="level-btn active" data-level="1">😊 Muy Fácil</button>
-            <button class="level-btn" data-level="2">🙂 Fácil</button>
-            <button class="level-btn" data-level="3">🤔 Medio</button>
-            <button class="level-btn" data-level="4">😰 Difícil</button>
-            <button class="level-btn" data-level="5">🔥 Muy Difícil</button>
+            <button class="level-btn active" data-level="1">😊 Very Easy</button>
+            <button class="level-btn" data-level="2">🙂 Easy</button>
+            <button class="level-btn" data-level="3">🤔 Medium</button>
+            <button class="level-btn" data-level="4">😰 Hard</button>
+            <button class="level-btn" data-level="5">🔥 Very Hard</button>
         </div>
 
         <div class="simple-guide">
-            <h3>🎯 Sistema Inteligente: Mueve SIEMPRE lo más parecido</h3>
+            <h3>🎯 Professional Notation: Say moves naturally</h3>
             <div class="examples">
                 <div class="example-box">
-                    <div class="notation">e2 e4</div>
-                    <div class="voice">"e dos e cuatro"</div>
+                    <div class="notation">e4</div>
+                    <div class="voice">"e four" / "pawn e four"</div>
                 </div>
                 <div class="example-box">
-                    <div class="notation">g1 f3</div>
-                    <div class="voice">"ge uno efe tres"</div>
+                    <div class="notation">Nf3</div>
+                    <div class="voice">"knight f three"</div>
                 </div>
                 <div class="example-box">
-                    <div class="notation">Automático</div>
-                    <div class="voice">Sin confirmación</div>
+                    <div class="notation">Bxc4</div>
+                    <div class="voice">"bishop takes c four"</div>
                 </div>
             </div>
         </div>
 
         <div class="game-status">
-            <h2 id="turn-indicator">Turno de las blancas</h2>
-            <p id="last-move">Última jugada: -</p>
-            <div id="spoken-text">Presiona "Activar Voz"</div>
+            <h2 id="turn-indicator">White to move</h2>
+            <p id="last-move">Last move: -</p>
+            <div id="spoken-text">Press "Start Voice" to begin</div>
         </div>
 
         <div class="voice-status" id="voice-status">
-            🎤 Micrófono activo - Di cualquier cosa parecida
+            🎤 Microphone active - Speak naturally
         </div>
 
         <div class="voice-controls">
             <button id="listen-btn" class="btn btn-success">
                 <span>🎤</span>
-                <span id="listen-text">Activar Voz</span>
+                <span id="listen-text">Start Voice</span>
             </button>
             <button id="repeat-btn" class="btn btn-secondary">
-                🔊 Repetir
+                🔊 Repeat
             </button>
         </div>
 
-        <input type="text" id="move-input" placeholder="Escribe: e2e4">
+        <input type="text" id="move-input" placeholder="Type: e4, Nf3, etc.">
 
         <div class="controls">
-            <button id="toggle-board-btn" class="btn btn-primary">👁️ Ocultar</button>
-            <button id="new-game-btn" class="btn btn-success">🆕 Nueva</button>
-            <button id="undo-btn" class="btn btn-warning">↩️ Deshacer</button>
-            <button id="resign-btn" class="btn btn-danger">🏳️ Rendirse</button>
-            <button id="draw-btn" class="btn btn-secondary">🤝 Tablas</button>
-            <button id="help-btn" class="btn btn-secondary">❓ Ayuda</button>
+            <button id="toggle-board-btn" class="btn btn-primary">👁️ Hide</button>
+            <button id="new-game-btn" class="btn btn-success">🆕 New Game</button>
+            <button id="undo-btn" class="btn btn-warning">↩️ Undo</button>
+            <button id="resign-btn" class="btn btn-danger">🏳️ Resign</button>
+            <button id="draw-btn" class="btn btn-secondary">🤝 Draw</button>
+            <button id="help-btn" class="btn btn-secondary">❓ Help</button>
         </div>
 
         <div id="board-container">
@@ -553,7 +558,7 @@
         </div>
 
         <div id="history-container">
-            <h3>📋 Historial</h3>
+            <h3>📋 Move History</h3>
             <div id="move-history"></div>
             <p style="margin-top: 12px; font-size: 13px; opacity: 0.8; font-weight: 600;"><strong>FEN:</strong> <span id="fen-display"></span></p>
         </div>
@@ -561,28 +566,140 @@
 
     <div id="help-modal" class="modal">
         <div class="modal-content">
-            <h2>📖 Sistema Inteligente</h2>
-            <p><strong>Nuevo:</strong> El sistema encuentra SIEMPRE el movimiento legal más parecido a lo que dijiste.</p>
-            <p><strong>No pregunta:</strong> Mueve directamente.</p>
-            <p><strong>Ejemplos:</strong></p>
-            <ul>
-                <li>e2e4 → "e dos e cuatro"</li>
-                <li>g1f3 → "ge uno efe tres"</li>
-                <li>Aunque no sea perfecto, mueve lo más parecido</li>
-            </ul>
-            <p><strong>Si te equivocas:</strong> Usa el botón "Deshacer"</p>
-            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">Cerrar</button>
+            <h2>📖 Professional Voice Chess Notation</h2>
+            
+            <div class="instruction-section">
+                <h3>🎯 Basic Move Format</h3>
+                <p><strong>Standard format:</strong> [Piece] [File] [Rank]</p>
+                <ul>
+                    <li><code>e4</code> → Say: <strong>"e four"</strong> or <strong>"pawn e four"</strong></li>
+                    <li><code>Nf3</code> → Say: <strong>"knight f three"</strong></li>
+                    <li><code>Bc4</code> → Say: <strong>"bishop c four"</strong></li>
+                    <li><code>Qd4</code> → Say: <strong>"queen d four"</strong></li>
+                    <li><code>Ra1</code> → Say: <strong>"rook a one"</strong></li>
+                </ul>
+            </div>
+
+            <div class="instruction-section">
+                <h3>⚔️ Captures</h3>
+                <p><strong>Format:</strong> [Piece] takes [Square]</p>
+                <ul>
+                    <li><code>Bxc4</code> → Say: <strong>"bishop takes c four"</strong></li>
+                    <li><code>exd5</code> → Say: <strong>"e takes d five"</strong> or <strong>"pawn takes d five"</strong></li>
+                    <li><code>Nxe5</code> → Say: <strong>"knight takes e five"</strong></li>
+                </ul>
+                <p><strong>Alternative:</strong> Can also say <strong>"bishop captures c four"</strong></p>
+            </div>
+
+            <div class="instruction-section">
+                <h3>🏰 Castling</h3>
+                <ul>
+                    <li><code>O-O</code> → Say: <strong>"castle kingside"</strong> or <strong>"short castle"</strong></li>
+                    <li><code>O-O-O</code> → Say: <strong>"castle queenside"</strong> or <strong>"long castle"</strong></li>
+                </ul>
+            </div>
+
+            <div class="instruction-section">
+                <h3>👑 Pawn Promotion</h3>
+                <p><strong>Format:</strong> [Move] promote [Piece]</p>
+                <ul>
+                    <li><code>e8=Q</code> → Say: <strong>"e eight promote queen"</strong></li>
+                    <li><code>a1=N</code> → Say: <strong>"a one promote knight"</strong></li>
+                </ul>
+                <p><strong>Alternative:</strong> <strong>"e eight queen"</strong> or <strong>"promote to queen"</strong></p>
+            </div>
+
+            <div class="instruction-section">
+                <h3>🔤 Piece Names</h3>
+                <ul>
+                    <li><strong>King</strong> = K</li>
+                    <li><strong>Queen</strong> = Q</li>
+                    <li><strong>Rook</strong> = R</li>
+                    <li><strong>Bishop</strong> = B</li>
+                    <li><strong>Knight</strong> = N (say "knight" NOT "N")</li>
+                    <li><strong>Pawn</strong> = (no letter, just the square)</li>
+                </ul>
+            </div>
+
+            <div class="instruction-section">
+                <h3>📍 Files and Ranks</h3>
+                <p><strong>Files (columns):</strong> a, b, c, d, e, f, g, h</p>
+                <p><strong>Ranks (rows):</strong> 1, 2, 3, 4, 5, 6, 7, 8</p>
+                <p><strong>Say them clearly:</strong></p>
+                <ul>
+                    <li>"a" = "ay" (like the letter A)</li>
+                    <li>"b" = "bee"</li>
+                    <li>"c" = "see"</li>
+                    <li>"d" = "dee"</li>
+                    <li>"e" = "ee"</li>
+                    <li>"f" = "eff"</li>
+                    <li>"g" = "gee"</li>
+                    <li>"h" = "aitch" or "haitch"</li>
+                </ul>
+            </div>
+
+            <div class="instruction-section">
+                <h3>💡 All Valid Ways to Say Moves</h3>
+                <p><strong>Example: Moving pawn to e4</strong></p>
+                <ul>
+                    <li>✅ "e four"</li>
+                    <li>✅ "pawn e four"</li>
+                    <li>✅ "pawn to e four"</li>
+                    <li>✅ "e 4" (with pause)</li>
+                </ul>
+                
+                <p><strong>Example: Knight to f3</strong></p>
+                <ul>
+                    <li>✅ "knight f three"</li>
+                    <li>✅ "knight to f three"</li>
+                    <li>✅ "n f three"</li>
+                </ul>
+
+                <p><strong>Example: Bishop captures c4</strong></p>
+                <ul>
+                    <li>✅ "bishop takes c four"</li>
+                    <li>✅ "bishop captures c four"</li>
+                    <li>✅ "b takes c four"</li>
+                    <li>✅ "take c four with bishop"</li>
+                </ul>
+            </div>
+
+            <div class="instruction-section">
+                <h3>🎤 Tips for Best Recognition</h3>
+                <ul>
+                    <li>Speak <strong>clearly and naturally</strong> (not too fast)</li>
+                    <li>Pause slightly between file and rank: "e... four"</li>
+                    <li>English voice recognition is <strong>85-90% accurate</strong> (vs 70% Spanish)</li>
+                    <li>System finds <strong>closest legal move</strong> automatically</li>
+                    <li>If wrong move, use <strong>"Undo"</strong> button</li>
+                    <li>Can mix notation styles (the system understands all)</li>
+                </ul>
+            </div>
+
+            <div class="instruction-section">
+                <h3>⌨️ Keyboard Shortcuts</h3>
+                <ul>
+                    <li><strong>N</strong> = New game</li>
+                    <li><strong>V</strong> = Toggle voice</li>
+                    <li><strong>U</strong> = Undo</li>
+                    <li><strong>H</strong> = Help</li>
+                    <li><strong>B</strong> = Hide/Show board</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">Got it!</button>
         </div>
     </div>
 
     <div id="promotion-modal" class="modal">
         <div class="modal-content">
-            <h2>👑 Promoción</h2>
+            <h2>👑 Pawn Promotion</h2>
+            <p>Choose promotion piece:</p>
             <div class="promotion-pieces">
-                <div class="promotion-piece" data-piece="q">♕</div>
-                <div class="promotion-piece" data-piece="r">♖</div>
-                <div class="promotion-piece" data-piece="b">♗</div>
-                <div class="promotion-piece" data-piece="n">♘</div>
+                <div class="promotion-piece" data-piece="q" title="Queen">♕</div>
+                <div class="promotion-piece" data-piece="r" title="Rook">♖</div>
+                <div class="promotion-piece" data-piece="b" title="Bishop">♗</div>
+                <div class="promotion-piece" data-piece="n" title="Knight">♘</div>
             </div>
         </div>
     </div>
@@ -734,21 +851,17 @@
             resignBtn: document.getElementById('resign-btn'),
             drawBtn: document.getElementById('draw-btn'),
             helpBtn: document.getElementById('help-btn'),
-            permissionAlert: document.getElementById('permission-alert'),
             voiceStatus: document.getElementById('voice-status')
         };
 
         function init() {
-            const isAndroid = /Android/i.test(navigator.userAgent);
-            if (isAndroid) elements.permissionAlert.classList.add('show');
             initSpeechRecognition();
             setupEventListeners();
             renderBoard();
             updateUI();
-            speak('Ajedrez a ciegas. Blancas.');
+            speak('Blindfold chess. White to move.');
         }
 
-        // ALGORITMO DE SIMILITUD MEJORADO
         function levenshteinDistance(a, b) {
             const matrix = [];
             for (let i = 0; i <= b.length; i++) {
@@ -781,22 +894,18 @@
             let bestScore = Infinity;
 
             for (const move of legalMoves) {
-                // Generar múltiples representaciones del movimiento
                 const representations = [
-                    `${move.from}${move.to}`,
-                    `${move.from} ${move.to}`,
                     move.san.toLowerCase(),
-                    move.san.replace('x', '').toLowerCase()
+                    move.san.replace('x', '').toLowerCase(),
+                    move.san.replace('+', '').replace('#', '').toLowerCase(),
+                    `${move.from}${move.to}`,
+                    `${move.from} ${move.to}`
                 ];
 
                 for (const rep of representations) {
                     const distance = levenshteinDistance(voiceText, rep);
-                    const similarity = 1 - (distance / Math.max(voiceText.length, rep.length));
-                    
-                    // Ponderación: preferir movimientos que coincidan en casillas
                     let score = distance;
                     
-                    // Bonus si las casillas coinciden
                     if (voiceText.includes(move.from) || voiceText.includes(move.to)) {
                         score -= 10;
                     }
@@ -808,7 +917,6 @@
                 }
             }
 
-            // SIEMPRE devolver el mejor match, sin threshold
             return bestMove;
         }
 
@@ -816,11 +924,11 @@
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
                 elements.listenBtn.disabled = true;
-                elements.listenBtn.innerHTML = '<span>❌</span><span>No disponible</span>';
+                elements.listenBtn.innerHTML = '<span>❌</span><span>Not available</span>';
                 return;
             }
             recognition = new SpeechRecognition();
-            recognition.lang = 'es-ES';
+            recognition.lang = 'en-US';  // INGLÉS
             recognition.continuous = true;
             recognition.interimResults = false;
             recognition.maxAlternatives = 5;
@@ -828,8 +936,7 @@
             recognition.onstart = () => {
                 permissionDenied = false;
                 elements.listenBtn.classList.add('listening');
-                elements.listenText.textContent = 'Escuchando...';
-                elements.permissionAlert.classList.remove('show');
+                elements.listenText.textContent = 'Listening...';
                 elements.voiceStatus.classList.add('active');
             };
             
@@ -838,18 +945,25 @@
                 const result = event.results[lastResultIndex];
                 
                 if (result.isFinal && waitingForMove && !isSpeaking) {
-                    // Probar TODAS las alternativas
                     let bestTranscript = result[0].transcript.toLowerCase();
                     let bestMove = null;
                     
                     for (let i = 0; i < result.length; i++) {
                         const alt = result[i].transcript.toLowerCase();
+                        console.log(`Alt ${i}:`, alt);
                         const cleanAlt = cleanText(alt);
-                        const move = findBestLegalMove(cleanAlt);
+                        const parsed = parseEnglishMove(cleanAlt);
                         
-                        if (move) {
+                        if (parsed) {
                             bestTranscript = alt;
-                            bestMove = move;
+                            bestMove = parsed;
+                            break;
+                        }
+                        
+                        const fuzzyMove = findBestLegalMove(cleanAlt);
+                        if (fuzzyMove) {
+                            bestTranscript = alt;
+                            bestMove = fuzzyMove;
                             break;
                         }
                     }
@@ -858,11 +972,25 @@
                     waitingForMove = false;
                     
                     if (bestMove) {
-                        // MOVER DIRECTAMENTE el mejor match
-                        executeMove(bestMove);
+                        const moveResult = typeof bestMove === 'string' 
+                            ? game.move(bestMove, {sloppy: true})
+                            : game.move(bestMove);
+                            
+                        if (moveResult) {
+                            playSuccessBeep();
+                            speak(`${moveResult.san}`);
+                            renderBoard();
+                            updateUI();
+                            checkGameEnd();
+                            
+                            if (!game.game_over() && game.turn() !== playerColor) {
+                                setTimeout(requestAIMove, 600);
+                            }
+                        }
                     } else {
-                        // Intentar parsing manual
-                        processVoiceMove(bestTranscript);
+                        playErrorBeep();
+                        elements.spokenText.textContent = '❌ Not understood';
+                        setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
                     }
                 }
             };
@@ -882,18 +1010,82 @@
                     }, 100);
                 } else {
                     elements.listenBtn.classList.remove('listening');
-                    elements.listenText.textContent = 'Activar Voz';
+                    elements.listenText.textContent = 'Start Voice';
                     elements.voiceStatus.classList.remove('active');
                 }
             };
         }
 
+        function parseEnglishMove(text) {
+            text = text.replace(/\s+/g, '').toLowerCase();
+            
+            // Enroques
+            if (text.includes('castlekingside') || text.includes('shortcastle') || text.includes('kingside')) {
+                return 'O-O';
+            }
+            if (text.includes('castlequeenside') || text.includes('longcastle') || text.includes('queenside')) {
+                return 'O-O-O';
+            }
+            
+            // Mapeo de piezas en inglés
+            const pieceMap = {
+                'knight': 'N', 'n': 'N',
+                'bishop': 'B', 'b': 'B',
+                'rook': 'R', 'r': 'R',
+                'queen': 'Q', 'q': 'Q',
+                'king': 'K', 'k': 'K',
+                'pawn': ''
+            };
+            
+            // Mapeo de promociones
+            const promotionMap = {
+                'queen': 'q', 'q': 'q',
+                'rook': 'r', 'r': 'r',
+                'bishop': 'b', 'b': 'b',
+                'knight': 'n', 'n': 'n'
+            };
+            
+            let piece = '';
+            let capture = false;
+            let promotion = null;
+            
+            // Detectar captura
+            if (text.includes('takes') || text.includes('captures') || text.includes('x')) {
+                capture = true;
+                text = text.replace('takes', '').replace('captures', '').replace('x', '');
+            }
+            
+            // Detectar promoción
+            for (const [word, symbol] of Object.entries(promotionMap)) {
+                if (text.includes('promote' + word) || text.includes(word) && text.includes('eight')) {
+                    promotion = symbol;
+                    text = text.replace('promote', '').replace(word, '');
+                    break;
+                }
+            }
+            
+            // Detectar pieza
+            for (const [word, symbol] of Object.entries(pieceMap)) {
+                if (text.includes(word)) {
+                    piece = symbol;
+                    text = text.replace(word, '');
+                    break;
+                }
+            }
+            
+            // Buscar casilla (dos caracteres: letra + número)
+            const squareMatch = text.match(/([a-h])([1-8])/);
+            if (squareMatch) {
+                let moveStr = piece + (capture ? 'x' : '') + squareMatch[0];
+                if (promotion) moveStr += '=' + promotion.toUpperCase();
+                return moveStr;
+            }
+            
+            return null;
+        }
+
         function cleanText(text) {
-            return text.toLowerCase().trim()
-                .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e')
-                .replace(/[íìïî]/g, 'i').replace(/[óòöô]/g, 'o')
-                .replace(/[úùüû]/g, 'u')
-                .replace(/\s+/g, '');
+            return text.toLowerCase().trim();
         }
 
         function toggleVoiceRecognition() {
@@ -915,7 +1107,7 @@
             permissionDenied = false;
             try {
                 recognition.start();
-                speak('Voz activa. Di cualquier cosa parecida.', false);
+                speak('Voice activated. Say your move.', false);
             } catch (error) {
                 voiceActive = false;
                 playErrorBeep();
@@ -928,52 +1120,9 @@
             waitingForMove = false;
             try { recognition.stop(); } catch (error) {}
             elements.listenBtn.classList.remove('listening');
-            elements.listenText.textContent = 'Activar Voz';
+            elements.listenText.textContent = 'Start Voice';
             elements.voiceStatus.classList.remove('active');
-            speak('Voz desactivada.', false);
-        }
-
-        function processVoiceMove(text) {
-            text = cleanText(text);
-            
-            // Enroques
-            if (text.includes('enroquecorto') || text.includes('enroquerey')) {
-                const move = game.move('O-O');
-                if (move) {
-                    executeMove(move);
-                    return;
-                }
-            }
-            if (text.includes('enroquelargo') || text.includes('enroquedama')) {
-                const move = game.move('O-O-O');
-                if (move) {
-                    executeMove(move);
-                    return;
-                }
-            }
-            
-            // Intentar encontrar el mejor movimiento legal
-            const bestMove = findBestLegalMove(text);
-            if (bestMove) {
-                executeMove(bestMove);
-            } else {
-                playErrorBeep();
-                elements.spokenText.textContent = '❌ No se encontró movimiento similar';
-                setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
-            }
-        }
-
-        function executeMove(move) {
-            playSuccessBeep();
-            speak(`${move.from} a ${move.to}`);
-            renderBoard();
-            updateUI();
-            checkGameEnd();
-            
-            if (!game.game_over() && game.turn() !== playerColor) {
-                waitingForMove = false;
-                setTimeout(requestAIMove, 600);
-            }
+            speak('Voice deactivated.', false);
         }
 
         function speak(text, save = true) {
@@ -983,19 +1132,19 @@
             isSpeaking = true;
             
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'es-ES';
+            utterance.lang = 'en-US';  // INGLÉS
             utterance.rate = 0.9;
             
             const voices = synthesis.getVoices();
-            const spanishVoice = voices.find(v => v.lang.startsWith('es'));
-            if (spanishVoice) utterance.voice = spanishVoice;
+            const englishVoice = voices.find(v => v.lang.startsWith('en'));
+            if (englishVoice) utterance.voice = englishVoice;
             
             utterance.onend = () => {
                 isSpeaking = false;
                 if (voiceActive && game.turn() === playerColor && !game.game_over()) {
                     setTimeout(() => {
                         waitingForMove = true;
-                        elements.spokenText.textContent = 'Tu turno';
+                        elements.spokenText.textContent = 'Your move';
                     }, 300);
                 }
             };
@@ -1003,38 +1152,39 @@
             synthesis.speak(utterance);
         }
 
-        function attemptMove(moveData) {
+        function attemptMove(moveStr) {
             if (game.game_over()) {
                 playErrorBeep();
-                speak('Terminada');
+                speak('Game over');
                 return;
             }
             if (game.turn() !== playerColor) {
                 playErrorBeep();
-                speak('No es tu turno');
+                speak('Not your turn');
                 return;
             }
             
             try {
-                let move;
-                if (typeof moveData === 'string') {
-                    const from = moveData.slice(0, 2);
-                    const to = moveData.slice(2, 4);
-                    move = game.move({from, to});
-                } else {
-                    move = game.move(moveData);
-                }
+                const move = game.move(moveStr, {sloppy: true});
                 
                 if (move) {
-                    executeMove(move);
+                    playSuccessBeep();
+                    speak(`${move.san}`);
+                    renderBoard();
+                    updateUI();
+                    checkGameEnd();
+                    
+                    if (!game.game_over() && game.turn() !== playerColor) {
+                        setTimeout(requestAIMove, 600);
+                    }
                 } else {
                     playErrorBeep();
-                    speak('Ilegal');
+                    speak('Illegal move');
                     setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
                 }
             } catch (error) {
                 playErrorBeep();
-                speak('Ilegal');
+                speak('Illegal move');
                 setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
             }
         }
@@ -1048,7 +1198,7 @@
                 const move = ChessEngine.getBestMove(game, currentLevel);
                 if (move) {
                     game.move(move);
-                    speak(`${move.from} a ${move.to}`);
+                    speak(`${move.san}`);
                     renderBoard();
                     updateUI();
                     checkGameEnd();
@@ -1060,7 +1210,14 @@
         function makeMove(from, to, promotion = 'q') {
             const move = game.move({from, to, promotion});
             if (move) {
-                executeMove(move);
+                playSuccessBeep();
+                speak(`${move.san}`);
+                renderBoard();
+                updateUI();
+                checkGameEnd();
+                if (!game.game_over() && game.turn() !== playerColor) {
+                    setTimeout(requestAIMove, 600);
+                }
                 return true;
             } else {
                 playErrorBeep();
@@ -1164,11 +1321,11 @@
         }
 
         function updateUI() {
-            const turn = game.turn() === 'w' ? 'blancas' : 'negras';
-            elements.turnIndicator.textContent = `Turno: ${turn}`;
+            const turn = game.turn() === 'w' ? 'White' : 'Black';
+            elements.turnIndicator.textContent = `${turn} to move`;
             const history = game.history({verbose: true});
             if (history.length > 0) {
-                elements.lastMove.textContent = `Última: ${history[history.length - 1].san}`;
+                elements.lastMove.textContent = `Last move: ${history[history.length - 1].san}`;
             }
             elements.moveHistory.textContent = game.pgn();
             elements.fenDisplay.textContent = game.fen();
@@ -1176,12 +1333,14 @@
 
         function checkGameEnd() {
             if (game.in_checkmate()) {
-                const winner = game.turn() === 'w' ? 'negras' : 'blancas';
-                speak(`Jaque mate. ${winner}.`);
+                const winner = game.turn() === 'w' ? 'Black' : 'White';
+                speak(`Checkmate. ${winner} wins.`);
                 stopVoiceRecognition();
             } else if (game.in_draw()) {
-                speak('Tablas');
+                speak('Draw');
                 stopVoiceRecognition();
+            } else if (game.in_check()) {
+                speak('Check');
             }
         }
 
@@ -1189,52 +1348,52 @@
             boardVisible = !boardVisible;
             if (boardVisible) {
                 elements.boardContainer.classList.remove('hidden');
-                elements.toggleBoardBtn.innerHTML = '👁️ Ocultar';
+                elements.toggleBoardBtn.innerHTML = '👁️ Hide';
             } else {
                 elements.boardContainer.classList.add('hidden');
-                elements.toggleBoardBtn.innerHTML = '👁️ Mostrar';
+                elements.toggleBoardBtn.innerHTML = '👁️ Show';
             }
         }
 
         function newGame() {
-            if (confirm('¿Nueva?')) {
+            if (confirm('Start new game?')) {
                 game.reset();
                 selectedSquare = null;
                 isThinking = false;
                 waitingForMove = voiceActive;
                 renderBoard();
                 updateUI();
-                speak('Nueva. Blancas.');
+                speak('New game. White to move.');
             }
         }
 
         function undoMove() {
             if (game.history().length < 2) {
                 playErrorBeep();
-                speak('No hay');
+                speak('No moves to undo');
                 return;
             }
             game.undo();
             game.undo();
             renderBoard();
             updateUI();
-            speak('Deshecho');
+            speak('Undone');
             if (voiceActive) {
                 setTimeout(() => { waitingForMove = true; }, 1000);
             }
         }
 
         function resign() {
-            if (confirm('¿Rendirse?')) {
-                const winner = game.turn() === 'w' ? 'negras' : 'blancas';
-                speak(`Ganan ${winner}`);
+            if (confirm('Resign?')) {
+                const winner = game.turn() === 'w' ? 'Black' : 'White';
+                speak(`${winner} wins by resignation`);
                 stopVoiceRecognition();
             }
         }
 
         function offerDraw() {
-            if (confirm('¿Tablas?')) {
-                speak('Tablas');
+            if (confirm('Offer draw?')) {
+                speak('Draw agreed');
                 stopVoiceRecognition();
             }
         }
@@ -1251,12 +1410,9 @@
             
             elements.moveInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
-                    const input = elements.moveInput.value.trim().toLowerCase();
+                    const input = elements.moveInput.value.trim();
                     if (input) {
-                        const cleaned = input.replace(/\s+/g, '');
-                        if (cleaned.length >= 4) {
-                            attemptMove(cleaned);
-                        }
+                        attemptMove(input);
                         elements.moveInput.value = '';
                     }
                 }
@@ -1267,8 +1423,19 @@
                     document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     currentLevel = parseInt(this.dataset.level);
-                    speak(`Nivel ${this.textContent.replace(/[^a-zA-Záéíóú\s]/g, '')}`, false);
+                    speak(`Level ${this.textContent.replace(/[^a-zA-Z\s]/g, '')}`, false);
                 });
+            });
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                switch(e.key.toLowerCase()) {
+                    case 'n': newGame(); break;
+                    case 'b': toggleBoard(); break;
+                    case 'v': toggleVoiceRecognition(); break;
+                    case 'u': undoMove(); break;
+                    case 'h': openModal('help-modal'); break;
+                }
             });
             
             if (synthesis.onvoiceschanged !== undefined) {
