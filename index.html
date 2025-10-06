@@ -583,7 +583,7 @@
                 <div class="phonetic-item"><span class="letter">C</span> = Carlitos</div>
                 <div class="phonetic-item"><span class="letter">D</span> = Danielín</div>
                 <div class="phonetic-item"><span class="letter">E</span> = Emilio</div>
-                <div class="phonetic-item"><span class="letter">F</span> = Farol</div>
+                <div class="phonetic-item"><span class="letter">F</span> = Facun</div>
                 <div class="phonetic-item"><span class="letter">G</span> = Golfo</div>
                 <div class="phonetic-item"><span class="letter">H</span> = Harry</div>
             </div>
@@ -649,7 +649,7 @@
                     <li><strong>C</strong> = "Carlitos"</li>
                     <li><strong>D</strong> = "Danielín"</li>
                     <li><strong>E</strong> = "Emilio"</li>
-                    <li><strong>F</strong> = "Farol"</li>
+                    <li><strong>F</strong> = "Facun"</li>
                     <li><strong>G</strong> = "Golfo"</li>
                     <li><strong>H</strong> = "Harry"</li>
                 </ul>
@@ -666,7 +666,7 @@
                 
                 <p><strong>Piezas:</strong></p>
                 <ul>
-                    <li>Nf3 (Caballo) → Di: <strong>"Caballo Farol tres"</strong></li>
+                    <li>Nf3 (Caballo) → Di: <strong>"Caballo Facun tres"</strong></li>
                     <li>Bc4 (Alfil) → Di: <strong>"Alfil Carlitos cuatro"</strong></li>
                     <li>Bxc4 (Captura) → Di: <strong>"Alfil por Carlitos cuatro"</strong></li>
                     <li>Qh5 (Dama) → Di: <strong>"Dama Harry cinco"</strong></li>
@@ -1092,7 +1092,7 @@
                 'carlitos': 'c', 'carlos': 'c',
                 'danielin': 'd', 'danielín': 'd', 'daniel': 'd',
                 'emilio': 'e',
-                'farol': 'f',
+                'Facun': 'f',
                 'golfo': 'g',
                 'harry': 'h', 'hari': 'h',
                 // Fallback a letras simples
@@ -1246,7 +1246,7 @@
                     }
                 } else {
                     playErrorBeep();
-                    speak('Movimiento ilegal. Intenta de nuevo.');
+                    speak('no mames.');
                     setTimeout(() => { 
                         if (voiceActive) {
                             waitingForMove = true;
@@ -1256,7 +1256,7 @@
                 }
             } catch (error) {
                 playErrorBeep();
-                speak('Movimiento ilegal. Intenta de nuevo.');
+                speak('no mames.');
                 setTimeout(() => { 
                     if (voiceActive) {
                         waitingForMove = true;
@@ -1542,3 +1542,4 @@
     </script>
 </body>
 </html>
+
