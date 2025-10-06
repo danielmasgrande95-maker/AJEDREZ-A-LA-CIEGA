@@ -152,8 +152,10 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            will-change: contents;
-            contain: layout style paint;
+            /* SOLUCIÓN DEFINITIVA: Contenedor rígido */
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-font-smoothing: subpixel-antialiased;
         }
 
         .square {
@@ -164,12 +166,17 @@
             cursor: pointer;
             user-select: none;
             position: relative;
-            contain: layout style;
-            will-change: filter;
+            /* CRÍTICO: Sin transiciones, sin transformaciones, sin filtros */
+            pointer-events: auto;
         }
 
-        .square.light { background: var(--board-light); }
-        .square.dark { background: var(--board-dark); }
+        .square.light { 
+            background: var(--board-light); 
+        }
+        
+        .square.dark { 
+            background: var(--board-dark); 
+        }
         
         .square.selected { 
             background: linear-gradient(135deg, #90EE90, #32CD32) !important;
@@ -180,8 +187,9 @@
             background: linear-gradient(135deg, rgba(255, 193, 7, 0.5), rgba(255, 87, 34, 0.5)) !important;
         }
 
-        .square:hover {
-            filter: brightness(1.2);
+        /* SIN HOVER - Para evitar cualquier deformación */
+        .square:active {
+            opacity: 0.8;
         }
 
         .square .coord {
@@ -200,15 +208,6 @@
         .square .coord.rank {
             top: 3px;
             left: 5px;
-        }
-
-        .square .piece {
-            display: inline-block;
-            transition: transform 0.2s ease;
-        }
-
-        .square:hover .piece {
-            transform: scale(1.08);
         }
 
         .controls {
@@ -231,24 +230,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             position: relative;
             overflow: hidden;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .btn:active::before {
-            width: 300px;
-            height: 300px;
         }
 
         .btn:active {
@@ -371,54 +352,6 @@
             font-size: 14px;
             color: #666;
             font-style: italic;
-        }
-
-        .confirmation-box {
-            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 152, 0, 0.3));
-            backdrop-filter: blur(10px);
-            padding: 20px;
-            border-radius: 12px;
-            margin: 15px 0;
-            border: 3px solid #FF9800;
-            display: none;
-            text-align: center;
-        }
-
-        .confirmation-box.active {
-            display: block;
-        }
-
-        .confirmation-box h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: var(--dark);
-        }
-
-        .confirmation-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 15px;
-        }
-
-        .confirmation-buttons button {
-            padding: 12px 30px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-yes {
-            background: linear-gradient(135deg, #06D6A0, #048861);
-            color: white;
-        }
-
-        .btn-no {
-            background: linear-gradient(135deg, #EF476F, #C1184A);
-            color: white;
         }
 
         #history-container {
@@ -624,7 +557,7 @@
         </div>
 
         <div class="simple-guide">
-            <h3>🎯 SISTEMA SIMPLE: Origen → Destino</h3>
+            <h3>🎯 Di: Origen → Destino (sin confirmación)</h3>
             <div class="examples">
                 <div class="example-box">
                     <div class="notation">e2 e4</div>
@@ -645,14 +578,6 @@
             <h2 id="turn-indicator">Turno de las blancas</h2>
             <p id="last-move">Última jugada: -</p>
             <div id="spoken-text" role="status" aria-live="polite">Presiona "Activar Voz" para comenzar</div>
-        </div>
-
-        <div class="confirmation-box" id="confirmation-box">
-            <h3 id="confirmation-text">¿Quieres mover e2 a e4?</h3>
-            <div class="confirmation-buttons">
-                <button class="btn-yes" id="confirm-yes">✅ SÍ</button>
-                <button class="btn-no" id="confirm-no">❌ NO</button>
-            </div>
         </div>
 
         <div class="voice-status" id="voice-status">
@@ -685,7 +610,7 @@
         </div>
 
         <div id="history-container">
-            <h3>📋 Historial de movimientos</h3>
+            <h3>📋 Historial</h3>
             <div id="move-history"></div>
             <p style="margin-top: 12px; font-size: 13px; opacity: 0.8; font-weight: 600;"><strong>FEN:</strong> <span id="fen-display"></span></p>
         </div>
@@ -693,92 +618,45 @@
 
     <div id="help-modal" class="modal">
         <div class="modal-content">
-            <h2>📖 Sistema SIMPLE de Voz</h2>
+            <h2>📖 Ayuda</h2>
             
             <div class="instruction-section">
-                <h3>🎯 ¿Por qué este sistema es mejor?</h3>
-                <p>En lugar de memorizar "Ambrosio, Braulio...", usamos el <strong>sistema estándar de ajedrez</strong> que usan los profesionales en partidas a ciegas.</p>
-            </div>
-
-            <div class="instruction-section">
-                <h3>📝 Cómo funciona</h3>
-                <p><strong>Formato:</strong> Casilla de ORIGEN → Casilla de DESTINO</p>
-                <p><strong>Ejemplo 1:</strong> Para mover peón de e2 a e4</p>
+                <h3>🎯 Sistema Simple</h3>
+                <p><strong>Formato:</strong> Origen → Destino (SIN confirmación)</p>
                 <ul>
-                    <li>Di: <strong>"e dos e cuatro"</strong></li>
-                    <li>O escribe: <strong>e2e4</strong> o <strong>e2 e4</strong></li>
-                </ul>
-                <p><strong>Ejemplo 2:</strong> Para mover caballo de g1 a f3</p>
-                <ul>
-                    <li>Di: <strong>"ge uno efe tres"</strong></li>
-                    <li>O escribe: <strong>g1f3</strong></li>
+                    <li>e2e4 → "e dos e cuatro"</li>
+                    <li>g1f3 → "ge uno efe tres"</li>
+                    <li>e7e8 dama → "e siete e ocho dama"</li>
                 </ul>
             </div>
 
             <div class="instruction-section">
-                <h3>🔤 Letras (pronuncia claramente)</h3>
-                <ul>
-                    <li><strong>a</strong> = "a"</li>
-                    <li><strong>b</strong> = "be"</li>
-                    <li><strong>c</strong> = "ce"</li>
-                    <li><strong>d</strong> = "de"</li>
-                    <li><strong>e</strong> = "e"</li>
-                    <li><strong>f</strong> = "efe"</li>
-                    <li><strong>g</strong> = "ge"</li>
-                    <li><strong>h</strong> = "hache"</li>
-                </ul>
+                <h3>🔤 Letras</h3>
+                <p>a, be, ce, de, e, efe, ge, hache</p>
             </div>
 
             <div class="instruction-section">
                 <h3>🔢 Números</h3>
-                <p>Di los números del 1 al 8 claramente:</p>
-                <ul>
-                    <li>"uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho"</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>👑 Promoción de peón</h3>
-                <p>Si un peón llega a la última fila, añade la pieza:</p>
-                <ul>
-                    <li><strong>"e siete e ocho dama"</strong> → Promociona a Dama</li>
-                    <li><strong>"a dos a uno torre"</strong> → Promociona a Torre</li>
-                    <li>Opciones: dama, torre, alfil, caballo</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>♟️ Enroques</h3>
-                <ul>
-                    <li><strong>Enroque corto:</strong> Di "enroque corto" o mueve "e uno ge uno"</li>
-                    <li><strong>Enroque largo:</strong> Di "enroque largo" o mueve "e uno ce uno"</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>✅ Sistema de Confirmación</h3>
-                <p>Cuando digas un movimiento, la app preguntará:</p>
-                <p><strong>"¿Quieres mover [casilla] a [casilla]? Responde sí o no"</strong></p>
-                <p>Esto evita errores de reconocimiento.</p>
+                <p>uno, dos, tres, cuatro, cinco, seis, siete, ocho</p>
             </div>
 
             <div class="instruction-section">
                 <h3>💡 Consejos</h3>
                 <ul>
-                    <li>Habla <strong>pausado y claro</strong></li>
-                    <li>Di letra-número-letra-número</li>
-                    <li>Espera a que termine de hablar</li>
-                    <li>Si falla, usa el teclado (más confiable)</li>
+                    <li>Habla claro y pausado</li>
+                    <li>El movimiento se ejecuta DIRECTAMENTE</li>
+                    <li>Si hay error, usa "Deshacer"</li>
+                    <li>Para máxima precisión, escribe los movimientos</li>
                 </ul>
             </div>
 
-            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">¡Entendido!</button>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">Cerrar</button>
         </div>
     </div>
 
     <div id="promotion-modal" class="modal">
         <div class="modal-content">
-            <h2>👑 Promoción de peón</h2>
+            <h2>👑 Promoción</h2>
             <p>Selecciona la pieza:</p>
             <div class="promotion-pieces">
                 <div class="promotion-piece" data-piece="q" title="Dama">♕</div>
@@ -810,13 +688,13 @@
         }
 
         function playSuccessBeep() {
-            playBeep(523, 0.15);
-            setTimeout(() => playBeep(784, 0.2), 100);
+            playBeep(523, 0.12);
+            setTimeout(() => playBeep(784, 0.15), 80);
         }
 
         function playErrorBeep() {
-            playBeep(165, 0.15, 'square');
-            setTimeout(() => playBeep(131, 0.3, 'square'), 100);
+            playBeep(165, 0.12, 'square');
+            setTimeout(() => playBeep(131, 0.2, 'square'), 80);
         }
 
         // MOTOR
@@ -921,8 +799,6 @@
         let pendingPromotion = null;
         let voiceActive = false;
         let waitingForMove = false;
-        let waitingForConfirmation = false;
-        let pendingMove = null;
         let permissionDenied = false;
         let isSpeaking = false;
         let recognitionTimeout = null;
@@ -946,22 +822,17 @@
             drawBtn: document.getElementById('draw-btn'),
             helpBtn: document.getElementById('help-btn'),
             permissionAlert: document.getElementById('permission-alert'),
-            voiceStatus: document.getElementById('voice-status'),
-            confirmationBox: document.getElementById('confirmation-box'),
-            confirmationText: document.getElementById('confirmation-text'),
-            confirmYes: document.getElementById('confirm-yes'),
-            confirmNo: document.getElementById('confirm-no')
+            voiceStatus: document.getElementById('voice-status')
         };
 
         function init() {
-            console.log('Inicializando...');
             const isAndroid = /Android/i.test(navigator.userAgent);
             if (isAndroid) elements.permissionAlert.classList.add('show');
             initSpeechRecognition();
             setupEventListeners();
             renderBoard();
             updateUI();
-            speak('Bienvenido al ajedrez a ciegas. Sistema simple: di origen y destino. Ejemplo: e dos e cuatro.');
+            speak('Ajedrez a ciegas. Nueva partida. Juegan blancas.');
         }
 
         function initSpeechRecognition() {
@@ -975,7 +846,7 @@
             recognition.lang = 'es-ES';
             recognition.continuous = true;
             recognition.interimResults = false;
-            recognition.maxAlternatives = 3;
+            recognition.maxAlternatives = 5; // Aumentado para mayor tolerancia
             
             recognition.onstart = () => {
                 permissionDenied = false;
@@ -990,17 +861,25 @@
                 const lastResultIndex = event.results.length - 1;
                 const result = event.results[lastResultIndex];
                 
-                if (result.isFinal && !isSpeaking) {
-                    const transcript = result[0].transcript.toLowerCase();
-                    console.log('🎤:', transcript);
-                    elements.spokenText.textContent = `Escuchado: "${transcript}"`;
-                    
-                    if (waitingForConfirmation) {
-                        processConfirmation(transcript);
-                    } else if (waitingForMove) {
-                        waitingForMove = false;
-                        processVoiceMove(transcript);
+                if (result.isFinal && waitingForMove && !isSpeaking) {
+                    // Probar todas las alternativas
+                    let transcript = null;
+                    for (let i = 0; i < result.length; i++) {
+                        const alt = result[i].transcript.toLowerCase();
+                        console.log(`Alternativa ${i}:`, alt);
+                        const parsed = parseSimpleMove(alt);
+                        if (parsed) {
+                            transcript = alt;
+                            break;
+                        }
                     }
+                    
+                    if (!transcript) transcript = result[0].transcript.toLowerCase();
+                    
+                    console.log('🎤:', transcript);
+                    elements.spokenText.textContent = `"${transcript}"`;
+                    waitingForMove = false;
+                    processVoiceMove(transcript);
                 }
                 
                 if (voiceActive) {
@@ -1013,7 +892,6 @@
                     permissionDenied = true;
                     stopVoiceRecognition();
                     playErrorBeep();
-                    alert('🚫 Permiso denegado.');
                 }
             };
             
@@ -1051,7 +929,7 @@
             permissionDenied = false;
             try {
                 recognition.start();
-                speak('Voz activada. Di origen y destino. Ejemplo: e dos e cuatro.', false);
+                speak('Voz activada.', false);
             } catch (error) {
                 voiceActive = false;
                 playErrorBeep();
@@ -1062,7 +940,6 @@
             if (!voiceActive) return;
             voiceActive = false;
             waitingForMove = false;
-            waitingForConfirmation = false;
             if (recognitionTimeout) clearTimeout(recognitionTimeout);
             try { recognition.stop(); } catch (error) {}
             elements.listenBtn.classList.remove('listening');
@@ -1080,75 +957,64 @@
                 .replace(/[óòöô]/g, 'o')
                 .replace(/[úùüû]/g, 'u');
             
-            console.log('Procesando:', text);
-            
             // Enroques
             if (text.includes('enroque corto') || text.includes('enroque rey')) {
-                requestConfirmation('e1g1', 'enroque corto');
+                attemptMove('e1g1');
                 return;
             }
             if (text.includes('enroque largo') || text.includes('enroque dama')) {
-                requestConfirmation('e1c1', 'enroque largo');
+                attemptMove('e1c1');
                 return;
             }
             
             const move = parseSimpleMove(text);
             if (move) {
-                const { from, to, promotion } = move;
-                requestConfirmation({ from, to, promotion }, `${from} a ${to}`);
+                attemptMove(move);
             } else {
                 playErrorBeep();
-                elements.spokenText.textContent = '❌ No entendí. Di: letra número letra número';
+                elements.spokenText.textContent = '❌ No entendí';
                 setTimeout(() => { 
                     if (voiceActive) waitingForMove = true;
-                }, 2000);
+                }, 1500);
             }
         }
 
         function parseSimpleMove(text) {
-            // Mapeo de letras (pronunciación)
+            // Mapeo FLEXIBLE
             const letterMap = {
                 'a': 'a', 'be': 'b', 'ce': 'c', 'de': 'd',
                 'e': 'e', 'efe': 'f', 'ge': 'g', 'hache': 'h',
-                'b': 'b', 'c': 'c', 'd': 'd', 'f': 'f', 'g': 'g', 'h': 'h'
+                'b': 'b', 'c': 'c', 'd': 'd', 'f': 'f', 'g': 'g', 'h': 'h',
+                'ave': 'b', 'se': 'c', 'erre': 'r', 'ere': 'r'
             };
             
             const numberMap = {
                 'uno': '1', 'dos': '2', 'tres': '3', 'cuatro': '4',
                 'cinco': '5', 'seis': '6', 'siete': '7', 'ocho': '8',
                 '1': '1', '2': '2', '3': '3', '4': '4',
-                '5': '5', '6': '6', '7': '7', '8': '8', 'un': '1'
+                '5': '5', '6': '6', '7': '7', '8': '8', 
+                'un': '1', 'para': '4', 'y': '1'
             };
             
             const promotionMap = {
-                'dama': 'q', 'torre': 'r', 'alfil': 'b', 'caballo': 'n'
+                'dama': 'q', 'reina': 'q', 'torre': 'r', 
+                'alfil': 'b', 'caballo': 'n'
             };
             
-            // Extraer palabras
             const words = text.split(/\s+/);
-            
-            let from = '';
-            let to = '';
+            let foundSquares = [];
             let promotion = null;
             
-            // Buscar 4 componentes: letra1 número1 letra2 número2
-            let foundSquares = [];
+            // Buscar casillas
             for (let i = 0; i < words.length; i++) {
                 if (letterMap[words[i]]) {
                     const letter = letterMap[words[i]];
                     if (i + 1 < words.length && numberMap[words[i + 1]]) {
                         const number = numberMap[words[i + 1]];
                         foundSquares.push(letter + number);
-                        i++; // Saltar el número ya procesado
+                        i++;
                     }
                 }
-            }
-            
-            if (foundSquares.length >= 2) {
-                from = foundSquares[0];
-                to = foundSquares[1];
-            } else {
-                return null;
             }
             
             // Buscar promoción
@@ -1159,46 +1025,13 @@
                 }
             }
             
-            return { from, to, promotion };
-        }
-
-        function requestConfirmation(move, description) {
-            pendingMove = move;
-            waitingForConfirmation = true;
-            waitingForMove = false;
-            
-            elements.confirmationText.textContent = `¿Quieres mover ${description}?`;
-            elements.confirmationBox.classList.add('active');
-            speak(`¿Quieres mover ${description}? Responde sí o no.`);
-        }
-
-        function processConfirmation(text) {
-            waitingForConfirmation = false;
-            elements.confirmationBox.classList.remove('active');
-            
-            if (text.includes('si') || text.includes('sí') || text.includes('vale') || text.includes('ok')) {
-                attemptMove(pendingMove);
-            } else if (text.includes('no') || text.includes('cancelar')) {
-                speak('Cancelado. Di otro movimiento.');
-                pendingMove = null;
-                waitingForMove = true;
-            } else {
-                speak('No entendí. Di sí o no.');
-                waitingForConfirmation = true;
+            if (foundSquares.length >= 2) {
+                const from = foundSquares[0];
+                const to = foundSquares[1];
+                return { from, to, promotion };
             }
-        }
-
-        function confirmMove(confirmed) {
-            waitingForConfirmation = false;
-            elements.confirmationBox.classList.remove('active');
             
-            if (confirmed) {
-                attemptMove(pendingMove);
-            } else {
-                speak('Cancelado.');
-                pendingMove = null;
-                waitingForMove = true;
-            }
+            return null;
         }
 
         function speak(text, save = true) {
@@ -1209,7 +1042,7 @@
             
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-ES';
-            utterance.rate = 0.85;
+            utterance.rate = 0.9; // Un poco más rápido
             
             const voices = synthesis.getVoices();
             const spanishVoice = voices.find(v => v.lang.startsWith('es'));
@@ -1217,11 +1050,11 @@
             
             utterance.onend = () => {
                 isSpeaking = false;
-                if (voiceActive && game.turn() === playerColor && !game.game_over() && !waitingForConfirmation) {
+                if (voiceActive && game.turn() === playerColor && !game.game_over()) {
                     setTimeout(() => {
                         waitingForMove = true;
                         elements.spokenText.textContent = 'Tu turno';
-                    }, 500);
+                    }, 300);
                 }
             };
             
@@ -1247,40 +1080,37 @@
             try {
                 let move;
                 if (typeof moveData === 'string') {
-                    // Formato e2e4
                     const from = moveData.slice(0, 2);
                     const to = moveData.slice(2, 4);
                     move = game.move({ from, to });
                 } else {
-                    // Formato {from, to, promotion}
                     move = game.move(moveData);
                 }
                 
                 if (move) {
                     playSuccessBeep();
-                    speak(`Tu movimiento: ${getMoveAnnouncement(move)}`);
+                    speak(`${getMoveAnnouncement(move)}`);
                     renderBoard();
                     updateUI();
                     checkGameEnd();
-                    pendingMove = null;
                     
                     if (!game.game_over() && game.turn() !== playerColor) {
                         waitingForMove = false;
-                        setTimeout(requestAIMove, 1200);
+                        setTimeout(requestAIMove, 800);
                     }
                 } else {
                     playErrorBeep();
-                    speak('Movimiento ilegal.');
+                    speak('Ilegal');
                     setTimeout(() => { 
                         if (voiceActive) waitingForMove = true;
-                    }, 2000);
+                    }, 1500);
                 }
             } catch (error) {
                 playErrorBeep();
-                speak('Movimiento ilegal.');
+                speak('Ilegal');
                 setTimeout(() => { 
                     if (voiceActive) waitingForMove = true;
-                }, 2000);
+                }, 1500);
             }
         }
 
@@ -1288,32 +1118,31 @@
             if (isThinking || game.game_over()) return;
             isThinking = true;
             waitingForMove = false;
-            speak('Pensando...');
             
             setTimeout(() => {
                 const move = ChessEngine.getBestMove(game, currentLevel);
                 if (move) {
                     game.move(move);
-                    speak(`Mi movimiento: ${getMoveAnnouncement(move)}`);
+                    speak(`${getMoveAnnouncement(move)}`);
                     renderBoard();
                     updateUI();
                     checkGameEnd();
                 }
                 isThinking = false;
-            }, 800);
+            }, 600);
         }
 
         function makeMove(from, to, promotion = 'q') {
             const move = game.move({ from, to, promotion });
             if (move) {
                 playSuccessBeep();
-                speak(`Tu movimiento: ${getMoveAnnouncement(move)}`);
+                speak(`${getMoveAnnouncement(move)}`);
                 renderBoard();
                 updateUI();
                 checkGameEnd();
                 if (!game.game_over() && game.turn() !== playerColor) {
                     waitingForMove = false;
-                    setTimeout(requestAIMove, 1200);
+                    setTimeout(requestAIMove, 800);
                 }
                 return true;
             } else {
@@ -1337,10 +1166,7 @@
                     if (piece) {
                         const symbol = config.pieceSymbols[piece.type.toUpperCase()];
                         const coloredSymbol = piece.color === 'w' ? symbol : config.pieceSymbols[piece.type];
-                        const pieceSpan = document.createElement('span');
-                        pieceSpan.className = 'piece';
-                        pieceSpan.textContent = coloredSymbol;
-                        squareEl.appendChild(pieceSpan);
+                        squareEl.textContent = coloredSymbol;
                     }
                     
                     if (file === 7) {
@@ -1416,10 +1242,10 @@
 
         function updateUI() {
             const turn = game.turn() === 'w' ? 'blancas' : 'negras';
-            elements.turnIndicator.textContent = `Turno de las ${turn}`;
+            elements.turnIndicator.textContent = `Turno: ${turn}`;
             const history = game.history({ verbose: true });
             if (history.length > 0) {
-                elements.lastMove.textContent = `Última jugada: ${history[history.length - 1].san}`;
+                elements.lastMove.textContent = `Última: ${history[history.length - 1].san}`;
             }
             elements.moveHistory.textContent = game.pgn();
             elements.fenDisplay.textContent = game.fen();
@@ -1428,7 +1254,7 @@
         function checkGameEnd() {
             if (game.in_checkmate()) {
                 const winner = game.turn() === 'w' ? 'negras' : 'blancas';
-                speak(`Jaque mate. Ganan las ${winner}.`);
+                speak(`Jaque mate. Ganan ${winner}.`);
                 stopVoiceRecognition();
             } else if (game.in_draw()) {
                 speak('Tablas');
@@ -1453,11 +1279,9 @@
                 selectedSquare = null;
                 isThinking = false;
                 waitingForMove = voiceActive;
-                waitingForConfirmation = false;
-                pendingMove = null;
                 renderBoard();
                 updateUI();
-                speak('Nueva partida. Juegan las blancas.');
+                speak('Nueva partida. Blancas.');
             }
         }
 
@@ -1471,25 +1295,25 @@
             game.undo();
             renderBoard();
             updateUI();
-            speak('Deshecho. Tu turno.');
+            speak('Deshecho');
             if (voiceActive) {
                 setTimeout(() => {
                     waitingForMove = true;
-                }, 1500);
+                }, 1000);
             }
         }
 
         function resign() {
             if (confirm('¿Rendirse?')) {
                 const winner = game.turn() === 'w' ? 'negras' : 'blancas';
-                speak(`Te rindes. Ganan las ${winner}.`);
+                speak(`Ganan ${winner}`);
                 stopVoiceRecognition();
             }
         }
 
         function offerDraw() {
             if (confirm('¿Tablas?')) {
-                speak('Tablas acordadas');
+                speak('Tablas');
                 stopVoiceRecognition();
             }
         }
@@ -1504,14 +1328,10 @@
             elements.drawBtn.addEventListener('click', offerDraw);
             elements.helpBtn.addEventListener('click', () => openModal('help-modal'));
             
-            elements.confirmYes.addEventListener('click', () => confirmMove(true));
-            elements.confirmNo.addEventListener('click', () => confirmMove(false));
-            
             elements.moveInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     const input = elements.moveInput.value.trim().toLowerCase();
                     if (input) {
-                        // Formato flexible: e2e4, e2 e4, e 2 e 4
                         const cleaned = input.replace(/\s+/g, '');
                         if (cleaned.length >= 4) {
                             attemptMove(cleaned);
