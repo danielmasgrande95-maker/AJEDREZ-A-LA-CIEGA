@@ -19,8 +19,6 @@
             --success: #06D6A0;
             --danger: #EF476F;
             --warning: #FFD166;
-            --light: #F8F9FA;
-            --dark: #1A1A2E;
             --board-light: #F0D9B5;
             --board-dark: #B58863;
         }
@@ -32,7 +30,6 @@
             color: #333;
             min-height: 100vh;
             padding: 15px;
-            overflow-x: hidden;
         }
 
         .container {
@@ -61,7 +58,6 @@
             display: flex;
             gap: 8px;
             margin-bottom: 20px;
-            overflow-x: auto;
             flex-wrap: wrap;
         }
 
@@ -72,7 +68,7 @@
             border: 3px solid transparent;
             background: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)) padding-box,
                         linear-gradient(135deg, var(--gradient-start), var(--gradient-end)) border-box;
-            color: var(--dark);
+            color: #1A1A2E;
             border-radius: 12px;
             font-size: 13px;
             font-weight: bold;
@@ -95,7 +91,6 @@
             margin-bottom: 20px;
             text-align: center;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
         .game-status h2 {
@@ -110,7 +105,7 @@
 
         .game-status p {
             font-size: 16px;
-            color: var(--dark);
+            color: #1A1A2E;
             margin: 8px 0;
             font-weight: 600;
         }
@@ -123,7 +118,6 @@
             font-style: italic;
             min-height: 60px;
             border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             font-size: 15px;
             display: flex;
             align-items: center;
@@ -132,7 +126,8 @@
 
         #board-container {
             margin: 25px auto;
-            max-width: 500px;
+            width: 480px;
+            height: 480px;
             display: block;
         }
 
@@ -141,73 +136,64 @@
         }
 
         #board {
-            width: 100%;
-            max-width: 500px;
-            margin: 0 auto;
-            aspect-ratio: 1;
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            grid-template-rows: repeat(8, 1fr);
-            border: 5px solid var(--dark);
+            width: 480px;
+            height: 480px;
+            border: 5px solid #1A1A2E;
             border-radius: 12px;
-            overflow: hidden;
+            border-collapse: collapse;
+            table-layout: fixed;
+            background: #fff;
             box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            /* SOLUCIÓN DEFINITIVA: Contenedor rígido */
-            transform: translateZ(0);
-            backface-visibility: hidden;
-            -webkit-font-smoothing: subpixel-antialiased;
+            position: relative;
         }
 
         .square {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(28px, 7vw, 52px);
+            width: 60px;
+            height: 60px;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 42px;
             cursor: pointer;
             user-select: none;
             position: relative;
-            /* CRÍTICO: Sin transiciones, sin transformaciones, sin filtros */
-            pointer-events: auto;
         }
 
         .square.light { 
-            background: var(--board-light); 
+            background-color: #F0D9B5;
         }
         
         .square.dark { 
-            background: var(--board-dark); 
+            background-color: #B58863;
         }
         
         .square.selected { 
             background: linear-gradient(135deg, #90EE90, #32CD32) !important;
-            box-shadow: inset 0 0 20px rgba(0,255,0,0.3);
         }
         
         .square.last-move { 
             background: linear-gradient(135deg, rgba(255, 193, 7, 0.5), rgba(255, 87, 34, 0.5)) !important;
         }
 
-        /* SIN HOVER - Para evitar cualquier deformación */
         .square:active {
-            opacity: 0.8;
+            opacity: 0.85;
         }
 
         .square .coord {
             position: absolute;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
             opacity: 0.7;
             pointer-events: none;
         }
 
         .square .coord.file {
-            bottom: 3px;
-            right: 5px;
+            bottom: 2px;
+            right: 4px;
         }
 
         .square .coord.rank {
-            top: 3px;
-            left: 5px;
+            top: 2px;
+            left: 4px;
         }
 
         .controls {
@@ -226,10 +212,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
-            touch-action: manipulation;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            position: relative;
-            overflow: hidden;
         }
 
         .btn:active {
@@ -254,12 +237,7 @@
         }
         .btn-secondary { 
             background: linear-gradient(135deg, #E0E0E0, #BDBDBD);
-            color: var(--dark); 
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+            color: #1A1A2E; 
         }
 
         .voice-controls {
@@ -306,11 +284,6 @@
             font-weight: 500;
         }
 
-        #move-input:focus {
-            outline: none;
-            box-shadow: 0 0 25px rgba(255, 107, 53, 0.4);
-        }
-
         .simple-guide {
             background: linear-gradient(135deg, rgba(6, 214, 160, 0.2), rgba(4, 136, 97, 0.2));
             backdrop-filter: blur(10px);
@@ -323,7 +296,7 @@
         .simple-guide h3 {
             font-size: 18px;
             margin-bottom: 15px;
-            color: var(--dark);
+            color: #1A1A2E;
             font-weight: 800;
             text-align: center;
         }
@@ -363,7 +336,6 @@
             max-height: 250px;
             overflow-y: auto;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
 
         #history-container h3 {
@@ -380,7 +352,7 @@
             font-family: 'Courier New', monospace;
             font-size: 14px;
             white-space: pre-wrap;
-            color: var(--dark);
+            color: #1A1A2E;
             font-weight: 600;
         }
 
@@ -412,7 +384,6 @@
             max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 25px 70px rgba(0,0,0,0.5);
-            border: 2px solid rgba(255, 107, 53, 0.3);
         }
 
         .modal-content h2 {
@@ -424,13 +395,6 @@
             font-size: 24px;
         }
 
-        .modal-content h3 {
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: var(--primary);
-            font-size: 18px;
-        }
-
         .modal-content ul {
             margin-left: 20px;
             line-height: 1.8;
@@ -439,14 +403,6 @@
         .modal-content p {
             line-height: 1.8;
             margin-bottom: 10px;
-        }
-
-        .instruction-section {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.1), rgba(0, 78, 137, 0.1));
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border-left: 4px solid var(--primary);
         }
 
         #promotion-modal .promotion-pieces {
@@ -470,7 +426,6 @@
 
         .promotion-piece:hover {
             transform: scale(1.1);
-            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
         }
 
         .alert-box {
@@ -482,7 +437,6 @@
             border-radius: 10px;
             font-size: 14px;
             display: none;
-            border: 2px solid rgba(255, 152, 0, 0.4);
         }
 
         .alert-box.show {
@@ -507,36 +461,25 @@
         }
 
         @media (max-width: 600px) {
-            .container {
-                padding: 20px;
+            #board-container {
+                width: 320px;
+                height: 320px;
             }
 
-            h1 {
-                font-size: 26px;
+            #board {
+                width: 320px;
+                height: 320px;
+            }
+
+            .square {
+                width: 40px;
+                height: 40px;
+                font-size: 28px;
             }
 
             .controls {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            .btn {
-                padding: 12px 14px;
-                font-size: 14px;
-            }
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
-            border-radius: 10px;
         }
     </style>
 </head>
@@ -545,7 +488,7 @@
         <h1>♟️ Ajedrez a Ciegas ♟️</h1>
 
         <div class="alert-box" id="permission-alert">
-            📱 <strong>Android:</strong> Si no funciona la voz, ve a: Chrome ⋮ → Configuración → Configuración de sitios → Micrófono → Permitir
+            📱 <strong>Android:</strong> Chrome ⋮ → Configuración → Micrófono → Permitir
         </div>
 
         <div class="level-selector">
@@ -557,7 +500,7 @@
         </div>
 
         <div class="simple-guide">
-            <h3>🎯 Di: Origen → Destino (sin confirmación)</h3>
+            <h3>🎯 Sistema Inteligente: Mueve SIEMPRE lo más parecido</h3>
             <div class="examples">
                 <div class="example-box">
                     <div class="notation">e2 e4</div>
@@ -568,8 +511,8 @@
                     <div class="voice">"ge uno efe tres"</div>
                 </div>
                 <div class="example-box">
-                    <div class="notation">e7 e8 dama</div>
-                    <div class="voice">"e siete e ocho dama"</div>
+                    <div class="notation">Automático</div>
+                    <div class="voice">Sin confirmación</div>
                 </div>
             </div>
         </div>
@@ -577,11 +520,11 @@
         <div class="game-status">
             <h2 id="turn-indicator">Turno de las blancas</h2>
             <p id="last-move">Última jugada: -</p>
-            <div id="spoken-text" role="status" aria-live="polite">Presiona "Activar Voz" para comenzar</div>
+            <div id="spoken-text">Presiona "Activar Voz"</div>
         </div>
 
         <div class="voice-status" id="voice-status">
-            🎤 Micrófono activo - Habla cuando estés listo
+            🎤 Micrófono activo - Di cualquier cosa parecida
         </div>
 
         <div class="voice-controls">
@@ -594,7 +537,7 @@
             </button>
         </div>
 
-        <input type="text" id="move-input" placeholder="Escribe: e2e4 o e2 e4">
+        <input type="text" id="move-input" placeholder="Escribe: e2e4">
 
         <div class="controls">
             <button id="toggle-board-btn" class="btn btn-primary">👁️ Ocultar</button>
@@ -606,7 +549,7 @@
         </div>
 
         <div id="board-container">
-            <div id="board"></div>
+            <table id="board"></table>
         </div>
 
         <div id="history-container">
@@ -618,38 +561,16 @@
 
     <div id="help-modal" class="modal">
         <div class="modal-content">
-            <h2>📖 Ayuda</h2>
-            
-            <div class="instruction-section">
-                <h3>🎯 Sistema Simple</h3>
-                <p><strong>Formato:</strong> Origen → Destino (SIN confirmación)</p>
-                <ul>
-                    <li>e2e4 → "e dos e cuatro"</li>
-                    <li>g1f3 → "ge uno efe tres"</li>
-                    <li>e7e8 dama → "e siete e ocho dama"</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>🔤 Letras</h3>
-                <p>a, be, ce, de, e, efe, ge, hache</p>
-            </div>
-
-            <div class="instruction-section">
-                <h3>🔢 Números</h3>
-                <p>uno, dos, tres, cuatro, cinco, seis, siete, ocho</p>
-            </div>
-
-            <div class="instruction-section">
-                <h3>💡 Consejos</h3>
-                <ul>
-                    <li>Habla claro y pausado</li>
-                    <li>El movimiento se ejecuta DIRECTAMENTE</li>
-                    <li>Si hay error, usa "Deshacer"</li>
-                    <li>Para máxima precisión, escribe los movimientos</li>
-                </ul>
-            </div>
-
+            <h2>📖 Sistema Inteligente</h2>
+            <p><strong>Nuevo:</strong> El sistema encuentra SIEMPRE el movimiento legal más parecido a lo que dijiste.</p>
+            <p><strong>No pregunta:</strong> Mueve directamente.</p>
+            <p><strong>Ejemplos:</strong></p>
+            <ul>
+                <li>e2e4 → "e dos e cuatro"</li>
+                <li>g1f3 → "ge uno efe tres"</li>
+                <li>Aunque no sea perfecto, mueve lo más parecido</li>
+            </ul>
+            <p><strong>Si te equivocas:</strong> Usa el botón "Deshacer"</p>
             <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">Cerrar</button>
         </div>
     </div>
@@ -657,12 +578,11 @@
     <div id="promotion-modal" class="modal">
         <div class="modal-content">
             <h2>👑 Promoción</h2>
-            <p>Selecciona la pieza:</p>
             <div class="promotion-pieces">
-                <div class="promotion-piece" data-piece="q" title="Dama">♕</div>
-                <div class="promotion-piece" data-piece="r" title="Torre">♖</div>
-                <div class="promotion-piece" data-piece="b" title="Alfil">♗</div>
-                <div class="promotion-piece" data-piece="n" title="Caballo">♘</div>
+                <div class="promotion-piece" data-piece="q">♕</div>
+                <div class="promotion-piece" data-piece="r">♖</div>
+                <div class="promotion-piece" data-piece="b">♗</div>
+                <div class="promotion-piece" data-piece="n">♘</div>
             </div>
         </div>
     </div>
@@ -670,21 +590,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     
     <script>
-        // SONIDOS
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
-        function playBeep(frequency, duration, type = 'sine') {
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            oscillator.frequency.value = frequency;
-            oscillator.type = type;
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            oscillator.start(audioCtx.currentTime);
-            oscillator.stop(audioCtx.currentTime + duration);
+        function playBeep(freq, dur, type = 'sine') {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            osc.type = type;
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + dur);
         }
 
         function playSuccessBeep() {
@@ -697,14 +616,10 @@
             setTimeout(() => playBeep(131, 0.2, 'square'), 80);
         }
 
-        // MOTOR
         const ChessEngine = {
             levels: {
-                1: { depth: 1, random: 0.5 },
-                2: { depth: 2, random: 0.3 },
-                3: { depth: 3, random: 0.1 },
-                4: { depth: 4, random: 0.05 },
-                5: { depth: 5, random: 0 }
+                1: {depth: 1, random: 0.5}, 2: {depth: 2, random: 0.3},
+                3: {depth: 3, random: 0.1}, 4: {depth: 4, random: 0.05}, 5: {depth: 5, random: 0}
             },
             pieceValues: {'p': 100, 'n': 320, 'b': 330, 'r': 500, 'q': 900, 'k': 20000},
             evaluate(game) {
@@ -725,7 +640,7 @@
             },
             minimax(game, depth, alpha, beta, maximizing) {
                 if (depth === 0 || game.game_over()) return this.evaluate(game);
-                const moves = game.moves({ verbose: true });
+                const moves = game.moves({verbose: true});
                 if (maximizing) {
                     let maxEval = -Infinity;
                     for (const move of moves) {
@@ -752,7 +667,7 @@
             },
             getBestMove(game, level) {
                 const config = this.levels[level];
-                const moves = game.moves({ verbose: true });
+                const moves = game.moves({verbose: true});
                 if (moves.length === 0) return null;
                 if (Math.random() < config.random) {
                     return moves[Math.floor(Math.random() * moves.length)];
@@ -783,8 +698,7 @@
             pieceSymbols: {
                 'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
                 'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
-            },
-            pieceNames: {'p': 'peón', 'n': 'caballo', 'b': 'alfil', 'r': 'torre', 'q': 'dama', 'k': 'rey'}
+            }
         };
 
         let game = new Chess();
@@ -801,7 +715,6 @@
         let waitingForMove = false;
         let permissionDenied = false;
         let isSpeaking = false;
-        let recognitionTimeout = null;
 
         const elements = {
             board: document.getElementById('board'),
@@ -832,7 +745,71 @@
             setupEventListeners();
             renderBoard();
             updateUI();
-            speak('Ajedrez a ciegas. Nueva partida. Juegan blancas.');
+            speak('Ajedrez a ciegas. Blancas.');
+        }
+
+        // ALGORITMO DE SIMILITUD MEJORADO
+        function levenshteinDistance(a, b) {
+            const matrix = [];
+            for (let i = 0; i <= b.length; i++) {
+                matrix[i] = [i];
+            }
+            for (let j = 0; j <= a.length; j++) {
+                matrix[0][j] = j;
+            }
+            for (let i = 1; i <= b.length; i++) {
+                for (let j = 1; j <= a.length; j++) {
+                    if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+                    }
+                }
+            }
+            return matrix[b.length][a.length];
+        }
+
+        function findBestLegalMove(voiceText) {
+            const legalMoves = game.moves({verbose: true});
+            if (legalMoves.length === 0) return null;
+
+            let bestMove = null;
+            let bestScore = Infinity;
+
+            for (const move of legalMoves) {
+                // Generar múltiples representaciones del movimiento
+                const representations = [
+                    `${move.from}${move.to}`,
+                    `${move.from} ${move.to}`,
+                    move.san.toLowerCase(),
+                    move.san.replace('x', '').toLowerCase()
+                ];
+
+                for (const rep of representations) {
+                    const distance = levenshteinDistance(voiceText, rep);
+                    const similarity = 1 - (distance / Math.max(voiceText.length, rep.length));
+                    
+                    // Ponderación: preferir movimientos que coincidan en casillas
+                    let score = distance;
+                    
+                    // Bonus si las casillas coinciden
+                    if (voiceText.includes(move.from) || voiceText.includes(move.to)) {
+                        score -= 10;
+                    }
+                    
+                    if (score < bestScore) {
+                        bestScore = score;
+                        bestMove = move;
+                    }
+                }
+            }
+
+            // SIEMPRE devolver el mejor match, sin threshold
+            return bestMove;
         }
 
         function initSpeechRecognition() {
@@ -846,7 +823,7 @@
             recognition.lang = 'es-ES';
             recognition.continuous = true;
             recognition.interimResults = false;
-            recognition.maxAlternatives = 5; // Aumentado para mayor tolerancia
+            recognition.maxAlternatives = 5;
             
             recognition.onstart = () => {
                 permissionDenied = false;
@@ -857,33 +834,36 @@
             };
             
             recognition.onresult = (event) => {
-                if (recognitionTimeout) clearTimeout(recognitionTimeout);
                 const lastResultIndex = event.results.length - 1;
                 const result = event.results[lastResultIndex];
                 
                 if (result.isFinal && waitingForMove && !isSpeaking) {
-                    // Probar todas las alternativas
-                    let transcript = null;
+                    // Probar TODAS las alternativas
+                    let bestTranscript = result[0].transcript.toLowerCase();
+                    let bestMove = null;
+                    
                     for (let i = 0; i < result.length; i++) {
                         const alt = result[i].transcript.toLowerCase();
-                        console.log(`Alternativa ${i}:`, alt);
-                        const parsed = parseSimpleMove(alt);
-                        if (parsed) {
-                            transcript = alt;
+                        const cleanAlt = cleanText(alt);
+                        const move = findBestLegalMove(cleanAlt);
+                        
+                        if (move) {
+                            bestTranscript = alt;
+                            bestMove = move;
                             break;
                         }
                     }
                     
-                    if (!transcript) transcript = result[0].transcript.toLowerCase();
-                    
-                    console.log('🎤:', transcript);
-                    elements.spokenText.textContent = `"${transcript}"`;
+                    elements.spokenText.textContent = `"${bestTranscript}"`;
                     waitingForMove = false;
-                    processVoiceMove(transcript);
-                }
-                
-                if (voiceActive) {
-                    recognitionTimeout = setTimeout(() => {}, 30000);
+                    
+                    if (bestMove) {
+                        // MOVER DIRECTAMENTE el mejor match
+                        executeMove(bestMove);
+                    } else {
+                        // Intentar parsing manual
+                        processVoiceMove(bestTranscript);
+                    }
                 }
             };
             
@@ -896,11 +876,9 @@
             };
             
             recognition.onend = () => {
-                if (recognitionTimeout) clearTimeout(recognitionTimeout);
                 if (voiceActive && !game.game_over() && !permissionDenied && !isSpeaking) {
                     setTimeout(() => {
-                        try { recognition.start(); } 
-                        catch (e) {}
+                        try { recognition.start(); } catch (e) {}
                     }, 100);
                 } else {
                     elements.listenBtn.classList.remove('listening');
@@ -908,6 +886,14 @@
                     elements.voiceStatus.classList.remove('active');
                 }
             };
+        }
+
+        function cleanText(text) {
+            return text.toLowerCase().trim()
+                .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e')
+                .replace(/[íìïî]/g, 'i').replace(/[óòöô]/g, 'o')
+                .replace(/[úùüû]/g, 'u')
+                .replace(/\s+/g, '');
         }
 
         function toggleVoiceRecognition() {
@@ -929,7 +915,7 @@
             permissionDenied = false;
             try {
                 recognition.start();
-                speak('Voz activada.', false);
+                speak('Voz activa. Di cualquier cosa parecida.', false);
             } catch (error) {
                 voiceActive = false;
                 playErrorBeep();
@@ -940,7 +926,6 @@
             if (!voiceActive) return;
             voiceActive = false;
             waitingForMove = false;
-            if (recognitionTimeout) clearTimeout(recognitionTimeout);
             try { recognition.stop(); } catch (error) {}
             elements.listenBtn.classList.remove('listening');
             elements.listenText.textContent = 'Activar Voz';
@@ -949,89 +934,46 @@
         }
 
         function processVoiceMove(text) {
-            text = text.toLowerCase()
-                .trim()
-                .replace(/[áàäâ]/g, 'a')
-                .replace(/[éèëê]/g, 'e')
-                .replace(/[íìïî]/g, 'i')
-                .replace(/[óòöô]/g, 'o')
-                .replace(/[úùüû]/g, 'u');
+            text = cleanText(text);
             
             // Enroques
-            if (text.includes('enroque corto') || text.includes('enroque rey')) {
-                attemptMove('e1g1');
-                return;
+            if (text.includes('enroquecorto') || text.includes('enroquerey')) {
+                const move = game.move('O-O');
+                if (move) {
+                    executeMove(move);
+                    return;
+                }
             }
-            if (text.includes('enroque largo') || text.includes('enroque dama')) {
-                attemptMove('e1c1');
-                return;
+            if (text.includes('enroquelargo') || text.includes('enroquedama')) {
+                const move = game.move('O-O-O');
+                if (move) {
+                    executeMove(move);
+                    return;
+                }
             }
             
-            const move = parseSimpleMove(text);
-            if (move) {
-                attemptMove(move);
+            // Intentar encontrar el mejor movimiento legal
+            const bestMove = findBestLegalMove(text);
+            if (bestMove) {
+                executeMove(bestMove);
             } else {
                 playErrorBeep();
-                elements.spokenText.textContent = '❌ No entendí';
-                setTimeout(() => { 
-                    if (voiceActive) waitingForMove = true;
-                }, 1500);
+                elements.spokenText.textContent = '❌ No se encontró movimiento similar';
+                setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
             }
         }
 
-        function parseSimpleMove(text) {
-            // Mapeo FLEXIBLE
-            const letterMap = {
-                'a': 'a', 'be': 'b', 'ce': 'c', 'de': 'd',
-                'e': 'e', 'efe': 'f', 'ge': 'g', 'hache': 'h',
-                'b': 'b', 'c': 'c', 'd': 'd', 'f': 'f', 'g': 'g', 'h': 'h',
-                'ave': 'b', 'se': 'c', 'erre': 'r', 'ere': 'r'
-            };
+        function executeMove(move) {
+            playSuccessBeep();
+            speak(`${move.from} a ${move.to}`);
+            renderBoard();
+            updateUI();
+            checkGameEnd();
             
-            const numberMap = {
-                'uno': '1', 'dos': '2', 'tres': '3', 'cuatro': '4',
-                'cinco': '5', 'seis': '6', 'siete': '7', 'ocho': '8',
-                '1': '1', '2': '2', '3': '3', '4': '4',
-                '5': '5', '6': '6', '7': '7', '8': '8', 
-                'un': '1', 'para': '4', 'y': '1'
-            };
-            
-            const promotionMap = {
-                'dama': 'q', 'reina': 'q', 'torre': 'r', 
-                'alfil': 'b', 'caballo': 'n'
-            };
-            
-            const words = text.split(/\s+/);
-            let foundSquares = [];
-            let promotion = null;
-            
-            // Buscar casillas
-            for (let i = 0; i < words.length; i++) {
-                if (letterMap[words[i]]) {
-                    const letter = letterMap[words[i]];
-                    if (i + 1 < words.length && numberMap[words[i + 1]]) {
-                        const number = numberMap[words[i + 1]];
-                        foundSquares.push(letter + number);
-                        i++;
-                    }
-                }
+            if (!game.game_over() && game.turn() !== playerColor) {
+                waitingForMove = false;
+                setTimeout(requestAIMove, 600);
             }
-            
-            // Buscar promoción
-            for (const word of words) {
-                if (promotionMap[word]) {
-                    promotion = promotionMap[word];
-                    break;
-                }
-            }
-            
-            if (foundSquares.length >= 2) {
-                const from = foundSquares[0];
-                const to = foundSquares[1];
-                return { from, to, promotion };
-            }
-            
-            return null;
         }
 
         function speak(text, save = true) {
@@ -1042,7 +984,7 @@
             
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-ES';
-            utterance.rate = 0.9; // Un poco más rápido
+            utterance.rate = 0.9;
             
             const voices = synthesis.getVoices();
             const spanishVoice = voices.find(v => v.lang.startsWith('es'));
@@ -1061,14 +1003,10 @@
             synthesis.speak(utterance);
         }
 
-        function getMoveAnnouncement(move) {
-            return `${move.from} a ${move.to}`;
-        }
-
         function attemptMove(moveData) {
             if (game.game_over()) {
                 playErrorBeep();
-                speak('Partida terminada');
+                speak('Terminada');
                 return;
             }
             if (game.turn() !== playerColor) {
@@ -1082,35 +1020,22 @@
                 if (typeof moveData === 'string') {
                     const from = moveData.slice(0, 2);
                     const to = moveData.slice(2, 4);
-                    move = game.move({ from, to });
+                    move = game.move({from, to});
                 } else {
                     move = game.move(moveData);
                 }
                 
                 if (move) {
-                    playSuccessBeep();
-                    speak(`${getMoveAnnouncement(move)}`);
-                    renderBoard();
-                    updateUI();
-                    checkGameEnd();
-                    
-                    if (!game.game_over() && game.turn() !== playerColor) {
-                        waitingForMove = false;
-                        setTimeout(requestAIMove, 800);
-                    }
+                    executeMove(move);
                 } else {
                     playErrorBeep();
                     speak('Ilegal');
-                    setTimeout(() => { 
-                        if (voiceActive) waitingForMove = true;
-                    }, 1500);
+                    setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
                 }
             } catch (error) {
                 playErrorBeep();
                 speak('Ilegal');
-                setTimeout(() => { 
-                    if (voiceActive) waitingForMove = true;
-                }, 1500);
+                setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
             }
         }
 
@@ -1123,7 +1048,7 @@
                 const move = ChessEngine.getBestMove(game, currentLevel);
                 if (move) {
                     game.move(move);
-                    speak(`${getMoveAnnouncement(move)}`);
+                    speak(`${move.from} a ${move.to}`);
                     renderBoard();
                     updateUI();
                     checkGameEnd();
@@ -1133,17 +1058,9 @@
         }
 
         function makeMove(from, to, promotion = 'q') {
-            const move = game.move({ from, to, promotion });
+            const move = game.move({from, to, promotion});
             if (move) {
-                playSuccessBeep();
-                speak(`${getMoveAnnouncement(move)}`);
-                renderBoard();
-                updateUI();
-                checkGameEnd();
-                if (!game.game_over() && game.turn() !== playerColor) {
-                    waitingForMove = false;
-                    setTimeout(requestAIMove, 800);
-                }
+                executeMove(move);
                 return true;
             } else {
                 playErrorBeep();
@@ -1153,48 +1070,54 @@
 
         function renderBoard() {
             elements.board.innerHTML = '';
+            
             for (let rank = 8; rank >= 1; rank--) {
+                const row = document.createElement('tr');
+                
                 for (let file = 0; file < 8; file++) {
                     const square = String.fromCharCode(97 + file) + rank;
-                    const squareEl = document.createElement('div');
-                    squareEl.className = 'square';
-                    squareEl.dataset.square = square;
+                    const cell = document.createElement('td');
+                    cell.className = 'square';
+                    cell.dataset.square = square;
+                    
                     const isLight = (file + rank) % 2 === 0;
-                    squareEl.classList.add(isLight ? 'light' : 'dark');
+                    cell.classList.add(isLight ? 'light' : 'dark');
                     
                     const piece = game.get(square);
                     if (piece) {
                         const symbol = config.pieceSymbols[piece.type.toUpperCase()];
                         const coloredSymbol = piece.color === 'w' ? symbol : config.pieceSymbols[piece.type];
-                        squareEl.textContent = coloredSymbol;
+                        cell.textContent = coloredSymbol;
                     }
                     
                     if (file === 7) {
                         const rankLabel = document.createElement('span');
                         rankLabel.className = 'coord rank';
                         rankLabel.textContent = rank;
-                        squareEl.appendChild(rankLabel);
+                        cell.appendChild(rankLabel);
                     }
                     if (rank === 1) {
                         const fileLabel = document.createElement('span');
                         fileLabel.className = 'coord file';
                         fileLabel.textContent = String.fromCharCode(97 + file);
-                        squareEl.appendChild(fileLabel);
+                        cell.appendChild(fileLabel);
                     }
                     
-                    if (selectedSquare === square) squareEl.classList.add('selected');
+                    if (selectedSquare === square) cell.classList.add('selected');
                     
-                    const history = game.history({ verbose: true });
+                    const history = game.history({verbose: true});
                     if (history.length > 0) {
                         const lastMove = history[history.length - 1];
                         if (square === lastMove.from || square === lastMove.to) {
-                            squareEl.classList.add('last-move');
+                            cell.classList.add('last-move');
                         }
                     }
                     
-                    squareEl.addEventListener('click', () => handleSquareClick(square));
-                    elements.board.appendChild(squareEl);
+                    cell.addEventListener('click', () => handleSquareClick(square));
+                    row.appendChild(cell);
                 }
+                
+                elements.board.appendChild(row);
             }
         }
 
@@ -1215,7 +1138,7 @@
                     if (piece && piece.type === 'p' &&
                         ((piece.color === 'w' && square[1] === '8') ||
                          (piece.color === 'b' && square[1] === '1'))) {
-                        pendingPromotion = { from: selectedSquare, to: square };
+                        pendingPromotion = {from: selectedSquare, to: square};
                         showPromotionModal();
                     } else {
                         makeMove(selectedSquare, square);
@@ -1243,7 +1166,7 @@
         function updateUI() {
             const turn = game.turn() === 'w' ? 'blancas' : 'negras';
             elements.turnIndicator.textContent = `Turno: ${turn}`;
-            const history = game.history({ verbose: true });
+            const history = game.history({verbose: true});
             if (history.length > 0) {
                 elements.lastMove.textContent = `Última: ${history[history.length - 1].san}`;
             }
@@ -1254,7 +1177,7 @@
         function checkGameEnd() {
             if (game.in_checkmate()) {
                 const winner = game.turn() === 'w' ? 'negras' : 'blancas';
-                speak(`Jaque mate. Ganan ${winner}.`);
+                speak(`Jaque mate. ${winner}.`);
                 stopVoiceRecognition();
             } else if (game.in_draw()) {
                 speak('Tablas');
@@ -1274,21 +1197,21 @@
         }
 
         function newGame() {
-            if (confirm('¿Nueva partida?')) {
+            if (confirm('¿Nueva?')) {
                 game.reset();
                 selectedSquare = null;
                 isThinking = false;
                 waitingForMove = voiceActive;
                 renderBoard();
                 updateUI();
-                speak('Nueva partida. Blancas.');
+                speak('Nueva. Blancas.');
             }
         }
 
         function undoMove() {
             if (game.history().length < 2) {
                 playErrorBeep();
-                speak('No hay movimientos');
+                speak('No hay');
                 return;
             }
             game.undo();
@@ -1297,9 +1220,7 @@
             updateUI();
             speak('Deshecho');
             if (voiceActive) {
-                setTimeout(() => {
-                    waitingForMove = true;
-                }, 1000);
+                setTimeout(() => { waitingForMove = true; }, 1000);
             }
         }
 
@@ -1348,17 +1269,6 @@
                     currentLevel = parseInt(this.dataset.level);
                     speak(`Nivel ${this.textContent.replace(/[^a-zA-Záéíóú\s]/g, '')}`, false);
                 });
-            });
-            
-            document.addEventListener('keydown', (e) => {
-                if (e.target.tagName === 'INPUT') return;
-                switch(e.key.toLowerCase()) {
-                    case 'n': newGame(); break;
-                    case 'm': toggleBoard(); break;
-                    case 'e': toggleVoiceRecognition(); break;
-                    case 'r': speak(lastSpokenText, false); break;
-                    case 'h': openModal('help-modal'); break;
-                }
             });
             
             if (synthesis.onvoiceschanged !== undefined) {
