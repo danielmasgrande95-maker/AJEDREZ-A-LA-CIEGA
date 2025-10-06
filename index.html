@@ -152,6 +152,9 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            /* SOLUCIÓN DEFINITIVA para evitar deformaciones */
+            will-change: contents;
+            contain: layout style paint;
         }
 
         .square {
@@ -162,7 +165,9 @@
             cursor: pointer;
             user-select: none;
             position: relative;
-            /* CLAVE: Sin transform para evitar deformaciones */
+            /* CLAVE: Contenedor rígido sin transformaciones */
+            contain: layout style;
+            will-change: filter;
         }
 
         .square.light { background: var(--board-light); }
@@ -177,9 +182,9 @@
             background: linear-gradient(135deg, rgba(255, 193, 7, 0.5), rgba(255, 87, 34, 0.5)) !important;
         }
 
-        /* HOVER solo afecta al brillo, NO al tamaño */
+        /* SOLO filtro de brillo - SIN transform ni scale */
         .square:hover {
-            filter: brightness(1.15);
+            filter: brightness(1.2);
         }
 
         .square:active {
@@ -204,13 +209,14 @@
             left: 5px;
         }
 
-        /* Animación SOLO para las piezas */
+        /* Animación suave SOLO para piezas */
         .square .piece {
-            transition: transform 0.3s ease;
+            display: inline-block;
+            transition: transform 0.2s ease;
         }
 
         .square:hover .piece {
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
 
         .controls {
@@ -367,6 +373,54 @@
             font-size: 16px;
             color: var(--primary);
             font-weight: 800;
+        }
+
+        .confirmation-box {
+            background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 152, 0, 0.3));
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border: 3px solid #FF9800;
+            display: none;
+            text-align: center;
+        }
+
+        .confirmation-box.active {
+            display: block;
+        }
+
+        .confirmation-box h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .confirmation-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .confirmation-buttons button {
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-yes {
+            background: linear-gradient(135deg, #06D6A0, #048861);
+            color: white;
+        }
+
+        .btn-no {
+            background: linear-gradient(135deg, #EF476F, #C1184A);
+            color: white;
         }
 
         #history-container {
@@ -576,12 +630,12 @@
         </div>
 
         <div class="phonetic-guide">
-            <h3>🔤 Alfabeto (di estas palabras en español):</h3>
+            <h3>🔤 Alfabeto (di estas palabras):</h3>
             <div class="phonetic-grid">
                 <div class="phonetic-item"><span class="letter">A</span> = Ambrosio</div>
                 <div class="phonetic-item"><span class="letter">B</span> = Braulio</div>
                 <div class="phonetic-item"><span class="letter">C</span> = Carlitos</div>
-                <div class="phonetic-item"><span class="letter">D</span> = Danielín</div>
+                <div class="phonetic-item"><span class="letter">D</span> = Dani</div>
                 <div class="phonetic-item"><span class="letter">E</span> = Emilio</div>
                 <div class="phonetic-item"><span class="letter">F</span> = Facun</div>
                 <div class="phonetic-item"><span class="letter">G</span> = Golfo</div>
@@ -593,6 +647,14 @@
             <h2 id="turn-indicator">Turno de las blancas</h2>
             <p id="last-move">Última jugada: -</p>
             <div id="spoken-text" role="status" aria-live="polite">Presiona "Activar Voz" para comenzar</div>
+        </div>
+
+        <div class="confirmation-box" id="confirmation-box">
+            <h3 id="confirmation-text">¿Quieres mover Emilio cuatro?</h3>
+            <div class="confirmation-buttons">
+                <button class="btn-yes" id="confirm-yes">✅ SÍ</button>
+                <button class="btn-no" id="confirm-no">❌ NO</button>
+            </div>
         </div>
 
         <div class="voice-status" id="voice-status">
@@ -633,104 +695,46 @@
 
     <div id="help-modal" class="modal">
         <div class="modal-content">
-            <h2>📖 Cómo Jugar al Ajedrez a Ciegas</h2>
+            <h2>📖 Cómo Jugar</h2>
             
             <div class="instruction-section">
-                <h3>🎯 Objetivo del Juego</h3>
-                <p>El ajedrez a ciegas es una modalidad donde juegas <strong>sin ver el tablero</strong> (o con opción de ocultarlo). Debes memorizar las posiciones y decir tus movimientos por voz usando un alfabeto especial.</p>
+                <h3>🔤 Alfabeto</h3>
+                <p><strong>A</strong>=Ambrosio | <strong>B</strong>=Braulio | <strong>C</strong>=Carlitos | <strong>D</strong>=Dani</p>
+                <p><strong>E</strong>=Emilio | <strong>F</strong>=Facun | <strong>G</strong>=Golfo | <strong>H</strong>=Harry</p>
             </div>
 
             <div class="instruction-section">
-                <h3>🔤 Alfabeto Fonético Español</h3>
-                <p>Para que el reconocimiento de voz funcione perfectamente, debes usar estas palabras en lugar de las letras:</p>
+                <h3>📝 Ejemplos</h3>
                 <ul>
-                    <li><strong>A</strong> = "Ambrosio"</li>
-                    <li><strong>B</strong> = "Braulio"</li>
-                    <li><strong>C</strong> = "Carlitos"</li>
-                    <li><strong>D</strong> = "Danielín"</li>
-                    <li><strong>E</strong> = "Emilio"</li>
-                    <li><strong>F</strong> = "Facun"</li>
-                    <li><strong>G</strong> = "Golfo"</li>
-                    <li><strong>H</strong> = "Harry"</li>
+                    <li>e4 → "Emilio cuatro"</li>
+                    <li>Nf3 → "Caballo Facun tres"</li>
+                    <li>Bxc4 → "Alfil come Carlitos cuatro"</li>
+                    <li>O-O → "enroque corto"</li>
                 </ul>
             </div>
 
             <div class="instruction-section">
-                <h3>📝 Ejemplos de Movimientos</h3>
-                <p><strong>Peones:</strong></p>
-                <ul>
-                    <li>e4 → Di: <strong>"Emilio cuatro"</strong></li>
-                    <li>d5 → Di: <strong>"Danielín cinco"</strong></li>
-                    <li>Captura: exd5 → Di: <strong>"Emilio por Danielín cinco"</strong></li>
-                </ul>
-                
-                <p><strong>Piezas:</strong></p>
-                <ul>
-                    <li>Nf3 (Caballo) → Di: <strong>"Caballo Facun tres"</strong></li>
-                    <li>Bc4 (Alfil) → Di: <strong>"Alfil Carlitos cuatro"</strong></li>
-                    <li>Bxc4 (Captura) → Di: <strong>"Alfil por Carlitos cuatro"</strong></li>
-                    <li>Qh5 (Dama) → Di: <strong>"Dama Harry cinco"</strong></li>
-                    <li>Rd1 (Torre) → Di: <strong>"Torre Danielín uno"</strong></li>
-                </ul>
-
-                <p><strong>Movimientos Especiales:</strong></p>
-                <ul>
-                    <li>Enroque corto (O-O) → Di: <strong>"enroque corto"</strong></li>
-                    <li>Enroque largo (O-O-O) → Di: <strong>"enroque largo"</strong></li>
-                    <li>Promoción → Di: <strong>"Peón Emilio ocho corona a dama"</strong></li>
-                </ul>
+                <h3>🎯 Sistema de Confirmación</h3>
+                <p>Cuando digas un movimiento, la app te preguntará: <strong>"¿Quieres mover X? Responde sí o no"</strong></p>
+                <p>Responde claramente <strong>"SÍ"</strong> o <strong>"NO"</strong> para confirmar o cancelar.</p>
             </div>
 
             <div class="instruction-section">
-                <h3>🔊 Sonidos de Confirmación</h3>
+                <h3>🔊 Pitidos</h3>
                 <ul>
-                    <li>✅ <strong>Pitido AGUDO</strong> (ti-lín) = Movimiento correcto</li>
-                    <li>❌ <strong>Pitido GRAVE</strong> (tum-tum) = Error o movimiento ilegal</li>
+                    <li>✅ Pitido agudo = Movimiento válido</li>
+                    <li>❌ Pitido grave = Error o ilegal</li>
                 </ul>
             </div>
 
-            <div class="instruction-section">
-                <h3>🎮 Controles</h3>
-                <ul>
-                    <li><strong>Activar Voz:</strong> Inicia el reconocimiento de voz. El micrófono se queda activo hasta que hables.</li>
-                    <li><strong>Repetir:</strong> Repite el último mensaje hablado.</li>
-                    <li><strong>Ocultar/Mostrar:</strong> Esconde el tablero para jugar 100% a ciegas.</li>
-                    <li><strong>Deshacer:</strong> Retrocede tu último movimiento y el de la computadora.</li>
-                    <li><strong>Nueva Partida:</strong> Reinicia el juego.</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>💡 Consejos</h3>
-                <ul>
-                    <li>Habla <strong>claro y despacio</strong></li>
-                    <li>Di la palabra completa: "Ambrosio", no "a"</li>
-                    <li>Espera a que la computadora termine de hablar</li>
-                    <li>Tómate tu tiempo para pensar - el micrófono esperará</li>
-                    <li>Si el reconocimiento falla, prueba escribir el movimiento manualmente</li>
-                    <li>En móvil Android: asegúrate de dar permiso al micrófono</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>⌨️ Atajos de Teclado</h3>
-                <ul>
-                    <li><strong>N</strong> = Nueva partida</li>
-                    <li><strong>M</strong> = Mostrar/Ocultar tablero</li>
-                    <li><strong>E</strong> = Activar voz</li>
-                    <li><strong>R</strong> = Repetir locución</li>
-                    <li><strong>H</strong> = Ayuda (este menú)</li>
-                </ul>
-            </div>
-
-            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">¡Entendido! Empezar a Jugar</button>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 20px;" onclick="closeModal('help-modal')">¡Entendido!</button>
         </div>
     </div>
 
     <div id="promotion-modal" class="modal">
         <div class="modal-content">
             <h2>👑 Promoción de peón</h2>
-            <p>Selecciona la pieza a la que deseas promocionar:</p>
+            <p>Selecciona la pieza:</p>
             <div class="promotion-pieces">
                 <div class="promotion-piece" data-piece="q" title="Dama">♕</div>
                 <div class="promotion-piece" data-piece="r" title="Torre">♖</div>
@@ -743,26 +747,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     
     <script>
-        // ============================================
-        // GENERADOR DE SONIDOS (PITIDOS)
-        // ============================================
-        
+        // GENERADOR DE SONIDOS
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         const audioCtx = new AudioContext();
 
         function playBeep(frequency, duration, type = 'sine') {
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
             oscillator.frequency.value = frequency;
             oscillator.type = type;
-            
             gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            
             oscillator.start(audioCtx.currentTime);
             oscillator.stop(audioCtx.currentTime + duration);
         }
@@ -777,10 +774,7 @@
             setTimeout(() => playBeep(131, 0.3, 'square'), 100);
         }
 
-        // ============================================
         // MOTOR DE AJEDREZ
-        // ============================================
-        
         const ChessEngine = {
             levels: {
                 1: { depth: 1, random: 0.5 },
@@ -789,10 +783,7 @@
                 4: { depth: 4, random: 0.05 },
                 5: { depth: 5, random: 0 }
             },
-            pieceValues: {
-                'p': 100, 'n': 320, 'b': 330,
-                'r': 500, 'q': 900, 'k': 20000
-            },
+            pieceValues: {'p': 100, 'n': 320, 'b': 330, 'r': 500, 'q': 900, 'k': 20000},
             evaluate(game) {
                 if (game.in_checkmate()) return game.turn() === 'w' ? -99999 : 99999;
                 if (game.in_draw()) return 0;
@@ -870,10 +861,7 @@
                 'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
                 'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
             },
-            pieceNames: {
-                'p': 'peón', 'n': 'caballo', 'b': 'alfil',
-                'r': 'torre', 'q': 'dama', 'k': 'rey'
-            }
+            pieceNames: {'p': 'peón', 'n': 'caballo', 'b': 'alfil', 'r': 'torre', 'q': 'dama', 'k': 'rey'}
         };
 
         let game = new Chess();
@@ -888,6 +876,8 @@
         let pendingPromotion = null;
         let voiceActive = false;
         let waitingForMove = false;
+        let waitingForConfirmation = false;
+        let pendingMove = null;
         let permissionDenied = false;
         let isSpeaking = false;
         let recognitionTimeout = null;
@@ -911,15 +901,17 @@
             drawBtn: document.getElementById('draw-btn'),
             helpBtn: document.getElementById('help-btn'),
             permissionAlert: document.getElementById('permission-alert'),
-            voiceStatus: document.getElementById('voice-status')
+            voiceStatus: document.getElementById('voice-status'),
+            confirmationBox: document.getElementById('confirmation-box'),
+            confirmationText: document.getElementById('confirmation-text'),
+            confirmYes: document.getElementById('confirm-yes'),
+            confirmNo: document.getElementById('confirm-no')
         };
 
         function init() {
-            console.log('Inicializando ajedrez a ciegas...');
+            console.log('Inicializando...');
             const isAndroid = /Android/i.test(navigator.userAgent);
-            if (isAndroid) {
-                elements.permissionAlert.classList.add('show');
-            }
+            if (isAndroid) elements.permissionAlert.classList.add('show');
             initSpeechRecognition();
             setupEventListeners();
             renderBoard();
@@ -930,9 +922,8 @@
         function initSpeechRecognition() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (!SpeechRecognition) {
-                console.warn('Reconocimiento de voz no disponible');
                 elements.listenBtn.disabled = true;
-                elements.listenBtn.innerHTML = '<span>❌</span><span>Voz no disponible</span>';
+                elements.listenBtn.innerHTML = '<span>❌</span><span>No disponible</span>';
                 return;
             }
             recognition = new SpeechRecognition();
@@ -942,7 +933,6 @@
             recognition.maxAlternatives = 5;
             
             recognition.onstart = () => {
-                console.log('✅ Reconocimiento iniciado');
                 permissionDenied = false;
                 elements.listenBtn.classList.add('listening');
                 elements.listenText.textContent = 'Escuchando...';
@@ -951,38 +941,34 @@
             };
             
             recognition.onresult = (event) => {
-                if (recognitionTimeout) {
-                    clearTimeout(recognitionTimeout);
-                }
+                if (recognitionTimeout) clearTimeout(recognitionTimeout);
                 const lastResultIndex = event.results.length - 1;
                 const result = event.results[lastResultIndex];
-                if (result.isFinal && waitingForMove && !isSpeaking) {
+                
+                if (result.isFinal && !isSpeaking) {
                     const transcript = result[0].transcript.toLowerCase();
-                    console.log('🎤 Voz capturada:', transcript);
+                    console.log('🎤 Voz:', transcript);
                     elements.spokenText.textContent = `Escuchado: "${transcript}"`;
-                    waitingForMove = false;
-                    processVoiceMove(transcript);
+                    
+                    if (waitingForConfirmation) {
+                        processConfirmation(transcript);
+                    } else if (waitingForMove) {
+                        waitingForMove = false;
+                        processVoiceMove(transcript);
+                    }
                 }
+                
                 if (voiceActive) {
-                    recognitionTimeout = setTimeout(() => {
-                        console.log('⏰ Timeout');
-                    }, 30000);
+                    recognitionTimeout = setTimeout(() => {}, 30000);
                 }
             };
             
             recognition.onerror = (event) => {
-                console.error('❌ Error:', event.error);
                 if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
                     permissionDenied = true;
                     stopVoiceRecognition();
-                    elements.permissionAlert.classList.add('show');
                     playErrorBeep();
-                    alert('🚫 Permiso denegado. Activa el micrófono en Configuración de Chrome.');
-                } else if (event.error === 'audio-capture') {
-                    permissionDenied = true;
-                    stopVoiceRecognition();
-                    playErrorBeep();
-                    alert('❌ Micrófono no disponible.');
+                    alert('🚫 Permiso denegado.');
                 }
             };
             
@@ -991,7 +977,7 @@
                 if (voiceActive && !game.game_over() && !permissionDenied && !isSpeaking) {
                     setTimeout(() => {
                         try { recognition.start(); } 
-                        catch (e) { console.log('Restart error:', e); }
+                        catch (e) {}
                     }, 100);
                 } else {
                     elements.listenBtn.classList.remove('listening');
@@ -1004,7 +990,6 @@
         function toggleVoiceRecognition() {
             if (!recognition) {
                 playErrorBeep();
-                alert('❌ Reconocimiento de voz no disponible.');
                 return;
             }
             if (voiceActive) {
@@ -1021,9 +1006,8 @@
             permissionDenied = false;
             try {
                 recognition.start();
-                speak('Reconocimiento de voz activado. Usa el alfabeto: Ambrosio, Braulio, Carlitos, etcétera.', false);
+                speak('Voz activada. Usa: Ambrosio, Braulio, Carlitos, Dani, Emilio, Facun, Golfo, Harry.', false);
             } catch (error) {
-                console.error('Error:', error);
                 voiceActive = false;
                 playErrorBeep();
             }
@@ -1033,13 +1017,67 @@
             if (!voiceActive) return;
             voiceActive = false;
             waitingForMove = false;
+            waitingForConfirmation = false;
             if (recognitionTimeout) clearTimeout(recognitionTimeout);
-            try { recognition.stop(); } 
-            catch (error) { console.error('Error:', error); }
+            try { recognition.stop(); } catch (error) {}
             elements.listenBtn.classList.remove('listening');
             elements.listenText.textContent = 'Activar Voz';
             elements.voiceStatus.classList.remove('active');
-            speak('Reconocimiento de voz desactivado.', false);
+            speak('Voz desactivada.', false);
+        }
+
+        // ALGORITMO DE EMPAREJAMIENTO FUZZY (Levenshtein Distance)
+        function levenshteinDistance(a, b) {
+            const matrix = [];
+            for (let i = 0; i <= b.length; i++) {
+                matrix[i] = [i];
+            }
+            for (let j = 0; j <= a.length; j++) {
+                matrix[0][j] = j;
+            }
+            for (let i = 1; i <= b.length; i++) {
+                for (let j = 1; j <= a.length; j++) {
+                    if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1,
+                            matrix[i][j - 1] + 1,
+                            matrix[i - 1][j] + 1
+                        );
+                    }
+                }
+            }
+            return matrix[b.length][a.length];
+        }
+
+        function findBestMatch(text, possibleMoves) {
+            let bestMatch = null;
+            let bestScore = Infinity;
+            
+            for (const move of possibleMoves) {
+                const moveText = getMoveDescription(move);
+                const distance = levenshteinDistance(text, moveText.toLowerCase());
+                if (distance < bestScore) {
+                    bestScore = distance;
+                    bestMatch = move;
+                }
+            }
+            
+            // Si la distancia es razonable (menos del 40% de la longitud), devolver
+            if (bestMatch && bestScore < text.length * 0.4) {
+                return bestMatch;
+            }
+            return null;
+        }
+
+        function getMoveDescription(move) {
+            let desc = '';
+            if (move.piece !== 'p') {
+                desc += config.pieceNames[move.piece] + ' ';
+            }
+            desc += move.to;
+            return desc;
         }
 
         function processVoiceMove(text) {
@@ -1055,47 +1093,94 @@
             console.log('Procesando:', text);
             
             if (text.includes('enroque corto') || text.includes('enroque rey')) {
-                attemptMove('O-O');
+                requestConfirmation('O-O', 'enroque corto');
                 return;
             }
             if (text.includes('enroque largo') || text.includes('enroque dama')) {
-                attemptMove('O-O-O');
+                requestConfirmation('O-O-O', 'enroque largo');
                 return;
             }
             
             let promotion = null;
             if (text.includes('corona a dama') || text.includes('coronar dama')) promotion = 'q';
-            else if (text.includes('corona a torre') || text.includes('coronar torre')) promotion = 'r';
-            else if (text.includes('corona a alfil') || text.includes('coronar alfil')) promotion = 'b';
-            else if (text.includes('corona a caballo') || text.includes('coronar caballo')) promotion = 'n';
+            else if (text.includes('corona a torre')) promotion = 'r';
+            else if (text.includes('corona a alfil')) promotion = 'b';
+            else if (text.includes('corona a caballo')) promotion = 'n';
             
             const move = parseVoiceMove(text, promotion);
             if (move) {
-                attemptMove(move);
+                requestConfirmation(move, text);
             } else {
-                playErrorBeep();
-                elements.spokenText.textContent = '❌ No entendí. Usa: Ambrosio, Braulio, Carlitos...';
-                setTimeout(() => { 
-                    if (voiceActive) {
-                        waitingForMove = true;
-                        elements.spokenText.textContent = 'Intenta de nuevo...';
-                    }
-                }, 2000);
+                // INTENTAR EMPAREJAMIENTO FUZZY
+                const legalMoves = game.moves({ verbose: true });
+                const bestMatch = findBestMatch(text, legalMoves);
+                
+                if (bestMatch) {
+                    const moveStr = bestMatch.san;
+                    requestConfirmation(moveStr, `${getMoveDescription(bestMatch)} (sugerencia)`);
+                } else {
+                    playErrorBeep();
+                    elements.spokenText.textContent = '❌ No entendí. Intenta de nuevo.';
+                    setTimeout(() => { 
+                        if (voiceActive) {
+                            waitingForMove = true;
+                        }
+                    }, 2000);
+                }
+            }
+        }
+
+        function requestConfirmation(moveStr, description) {
+            pendingMove = moveStr;
+            waitingForConfirmation = true;
+            waitingForMove = false;
+            
+            elements.confirmationText.textContent = `¿Quieres mover ${description}?`;
+            elements.confirmationBox.classList.add('active');
+            speak(`¿Quieres mover ${description}? Responde sí o no.`);
+        }
+
+        function processConfirmation(text) {
+            waitingForConfirmation = false;
+            elements.confirmationBox.classList.remove('active');
+            
+            if (text.includes('si') || text.includes('sí') || text.includes('vale') || text.includes('ok') || text.includes('confirmar')) {
+                attemptMove(pendingMove);
+            } else if (text.includes('no') || text.includes('cancelar')) {
+                speak('Movimiento cancelado. Di otro movimiento.');
+                pendingMove = null;
+                waitingForMove = true;
+            } else {
+                speak('No entendí. Di sí o no.');
+                waitingForConfirmation = true;
+            }
+        }
+
+        function confirmMove(confirmed) {
+            waitingForConfirmation = false;
+            elements.confirmationBox.classList.remove('active');
+            
+            if (confirmed) {
+                attemptMove(pendingMove);
+            } else {
+                speak('Movimiento cancelado.');
+                pendingMove = null;
+                waitingForMove = true;
             }
         }
 
         function parseVoiceMove(text, promotion) {
-            // ALFABETO FONÉTICO PERSONALIZADO EN ESPAÑOL
+            // ALFABETO PERSONALIZADO + VARIACIONES
             const phoneticMap = {
-                'ambrosio': 'a',
-                'braulio': 'b',
-                'carlitos': 'c', 'carlos': 'c',
-                'dani': 'd', 'danielín': 'd', 'daniel': 'd',
-                'emilio': 'e',
-                'Facun': 'f',
-                'golfo': 'g',
-                'harry': 'h', 'hari': 'h',
-                // Fallback a letras simples
+                'ambrosio': 'a', 'ambros': 'a',
+                'braulio': 'b', 'braul': 'b',
+                'carlitos': 'c', 'carlos': 'c', 'carl': 'c',
+                'dani': 'd', 'daniel': 'd', 'danielin': 'd',
+                'emilio': 'e', 'emil': 'e',
+                'facun': 'f', 'facundo': 'f',
+                'golfo': 'g', 'golf': 'g',
+                'harry': 'h', 'ari': 'h',
+                // Fallback
                 'a': 'a', 'be': 'b', 'ce': 'c', 'de': 'd',
                 'e': 'e', 'efe': 'f', 'ge': 'g', 'hache': 'h'
             };
@@ -1104,14 +1189,16 @@
                 'uno': '1', 'dos': '2', 'tres': '3', 'cuatro': '4',
                 'cinco': '5', 'seis': '6', 'siete': '7', 'ocho': '8',
                 '1': '1', '2': '2', '3': '3', '4': '4',
-                '5': '5', '6': '6', '7': '7', '8': '8',
-                'un': '1'
+                '5': '5', '6': '6', '7': '7', '8': '8', 'un': '1'
             };
             
             const pieceMap = {
-                'peon': '', 'torre': 'R', 'caballo': 'N',
-                'alfil': 'B', 'dama': 'Q', 'rey': 'K',
-                'caballos': 'N', 'alfiles': 'B'
+                'peon': '', 'peones': '',
+                'torre': 'R', 'torres': 'R',
+                'caballo': 'N', 'caballos': 'N',
+                'alfil': 'B', 'alfiles': 'B',
+                'dama': 'Q', 'reina': 'Q',
+                'rey': 'K'
             };
             
             let piece = '';
@@ -1122,7 +1209,8 @@
                 }
             }
             
-            const isCapture = text.includes(' por ') || text.includes(' come ') || text.includes(' captura ') || text.includes(' x ');
+            const isCapture = text.includes(' por ') || text.includes(' come ') || text.includes(' captura ') || 
+                             text.includes(' toma ') || text.includes(' x ');
             
             let file = null;
             let rank = null;
@@ -1144,16 +1232,12 @@
                 rank = squareMatch[2];
             }
             
-            if (!file || !rank) {
-                console.log('No se pudo parsear:', text);
-                return null;
-            }
+            if (!file || !rank) return null;
             
             const square = file + rank;
             let moveStr = piece + (isCapture ? 'x' : '') + square;
             if (promotion) moveStr += '=' + promotion.toUpperCase();
             
-            console.log('Movimiento parseado:', moveStr);
             return moveStr;
         }
 
@@ -1166,7 +1250,6 @@
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'es-ES';
             utterance.rate = 0.85;
-            utterance.pitch = 1;
             
             const voices = synthesis.getVoices();
             const spanishVoice = voices.find(v => v.lang.startsWith('es'));
@@ -1174,10 +1257,10 @@
             
             utterance.onend = () => {
                 isSpeaking = false;
-                if (voiceActive && game.turn() === playerColor && !game.game_over()) {
+                if (voiceActive && game.turn() === playerColor && !game.game_over() && !waitingForConfirmation) {
                     setTimeout(() => {
                         waitingForMove = true;
-                        elements.spokenText.textContent = 'Tu turno - Habla cuando estés listo';
+                        elements.spokenText.textContent = 'Tu turno';
                     }, 500);
                 }
             };
@@ -1188,34 +1271,27 @@
         function getMoveAnnouncement(move) {
             if (move.san === 'O-O') return 'enroque corto';
             if (move.san === 'O-O-O') return 'enroque largo';
-            
             let announcement = '';
             const pieceName = config.pieceNames[move.piece] || '';
-            
             if (pieceName && pieceName !== 'peón') {
                 announcement += pieceName.charAt(0).toUpperCase() + pieceName.slice(1) + ' ';
             } else if (pieceName === 'peón') {
                 announcement += 'Peón ';
             }
-            
             if (move.captured) {
                 announcement += 'captura en ';
             } else {
                 announcement += 'a ';
             }
-            
             announcement += move.to;
-            
             if (move.promotion) {
                 announcement += `, corona a ${config.pieceNames[move.promotion]}`;
             }
-            
             if (game.in_checkmate()) {
                 announcement += '. Jaque mate';
             } else if (game.in_check()) {
                 announcement += '. Jaque';
             }
-            
             return announcement;
         }
 
@@ -1239,6 +1315,7 @@
                     renderBoard();
                     updateUI();
                     checkGameEnd();
+                    pendingMove = null;
                     
                     if (!game.game_over() && game.turn() !== playerColor) {
                         waitingForMove = false;
@@ -1246,22 +1323,16 @@
                     }
                 } else {
                     playErrorBeep();
-                    speak('no mames.');
+                    speak('Movimiento ilegal.');
                     setTimeout(() => { 
-                        if (voiceActive) {
-                            waitingForMove = true;
-                            elements.spokenText.textContent = 'Habla cuando estés listo';
-                        }
+                        if (voiceActive) waitingForMove = true;
                     }, 2000);
                 }
             } catch (error) {
                 playErrorBeep();
-                speak('no mames.');
+                speak('Movimiento ilegal.');
                 setTimeout(() => { 
-                    if (voiceActive) {
-                        waitingForMove = true;
-                        elements.spokenText.textContent = 'Habla cuando estés listo';
-                    }
+                    if (voiceActive) waitingForMove = true;
                 }, 2000);
             }
         }
@@ -1293,7 +1364,6 @@
                 renderBoard();
                 updateUI();
                 checkGameEnd();
-                
                 if (!game.game_over() && game.turn() !== playerColor) {
                     waitingForMove = false;
                     setTimeout(requestAIMove, 1200);
@@ -1320,7 +1390,6 @@
                     if (piece) {
                         const symbol = config.pieceSymbols[piece.type.toUpperCase()];
                         const coloredSymbol = piece.color === 'w' ? symbol : config.pieceSymbols[piece.type];
-                        // Envolver pieza en span para animarla independientemente
                         const pieceSpan = document.createElement('span');
                         pieceSpan.className = 'piece';
                         pieceSpan.textContent = coloredSymbol;
@@ -1340,9 +1409,7 @@
                         squareEl.appendChild(fileLabel);
                     }
                     
-                    if (selectedSquare === square) {
-                        squareEl.classList.add('selected');
-                    }
+                    if (selectedSquare === square) squareEl.classList.add('selected');
                     
                     const history = game.history({ verbose: true });
                     if (history.length > 0) {
@@ -1439,6 +1506,8 @@
                 selectedSquare = null;
                 isThinking = false;
                 waitingForMove = voiceActive;
+                waitingForConfirmation = false;
+                pendingMove = null;
                 renderBoard();
                 updateUI();
                 speak('Nueva partida. Juegan las blancas.');
@@ -1455,11 +1524,10 @@
             game.undo();
             renderBoard();
             updateUI();
-            speak('Movimientos deshechos. Es tu turno.');
+            speak('Movimientos deshechos. Tu turno.');
             if (voiceActive) {
                 setTimeout(() => {
                     waitingForMove = true;
-                    elements.spokenText.textContent = 'Habla cuando estés listo';
                 }, 1500);
             }
         }
@@ -1488,6 +1556,9 @@
             elements.resignBtn.addEventListener('click', resign);
             elements.drawBtn.addEventListener('click', offerDraw);
             elements.helpBtn.addEventListener('click', () => openModal('help-modal'));
+            
+            elements.confirmYes.addEventListener('click', () => confirmMove(true));
+            elements.confirmNo.addEventListener('click', () => confirmMove(false));
             
             elements.moveInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
@@ -1542,5 +1613,3 @@
     </script>
 </body>
 </html>
-
-
