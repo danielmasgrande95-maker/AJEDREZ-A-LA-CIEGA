@@ -25,7 +25,8 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            /* FONDO NEGRO → AZUL OSCURO */
+            background: linear-gradient(135deg, #000000 0%, #001f3f 50%, #003366 100%);
             background-attachment: fixed;
             color: #333;
             min-height: 100vh;
@@ -105,7 +106,7 @@
 
         .game-status p {
             font-size: 16px;
-            color: #1A1A2E;
+            color: #fff;
             margin: 8px 0;
             font-weight: 600;
         }
@@ -122,6 +123,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #1A1A2E;
         }
 
         #board-container {
@@ -296,7 +298,7 @@
         .simple-guide h3 {
             font-size: 18px;
             margin-bottom: 15px;
-            color: #1A1A2E;
+            color: #fff;
             font-weight: 800;
             text-align: center;
         }
@@ -352,8 +354,12 @@
             font-family: 'Courier New', monospace;
             font-size: 14px;
             white-space: pre-wrap;
-            color: #1A1A2E;
+            color: #fff;
             font-weight: 600;
+        }
+
+        #history-container p {
+            color: #fff;
         }
 
         .modal {
@@ -466,7 +472,7 @@
             display: block;
             background: linear-gradient(135deg, rgba(6, 214, 160, 0.3), rgba(4, 136, 97, 0.3));
             border: 2px solid rgba(6, 214, 160, 0.5);
-            color: #048861;
+            color: #06D6A0;
         }
 
         @media (max-width: 600px) {
@@ -575,115 +581,22 @@
                     <li><code>e4</code> → Say: <strong>"e four"</strong> or <strong>"pawn e four"</strong></li>
                     <li><code>Nf3</code> → Say: <strong>"knight f three"</strong></li>
                     <li><code>Bc4</code> → Say: <strong>"bishop c four"</strong></li>
-                    <li><code>Qd4</code> → Say: <strong>"queen d four"</strong></li>
-                    <li><code>Ra1</code> → Say: <strong>"rook a one"</strong></li>
                 </ul>
             </div>
 
             <div class="instruction-section">
                 <h3>⚔️ Captures</h3>
-                <p><strong>Format:</strong> [Piece] takes [Square]</p>
                 <ul>
                     <li><code>Bxc4</code> → Say: <strong>"bishop takes c four"</strong></li>
-                    <li><code>exd5</code> → Say: <strong>"e takes d five"</strong> or <strong>"pawn takes d five"</strong></li>
-                    <li><code>Nxe5</code> → Say: <strong>"knight takes e five"</strong></li>
+                    <li><code>exd5</code> → Say: <strong>"e takes d five"</strong></li>
                 </ul>
-                <p><strong>Alternative:</strong> Can also say <strong>"bishop captures c four"</strong></p>
             </div>
 
             <div class="instruction-section">
                 <h3>🏰 Castling</h3>
                 <ul>
-                    <li><code>O-O</code> → Say: <strong>"castle kingside"</strong> or <strong>"short castle"</strong></li>
-                    <li><code>O-O-O</code> → Say: <strong>"castle queenside"</strong> or <strong>"long castle"</strong></li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>👑 Pawn Promotion</h3>
-                <p><strong>Format:</strong> [Move] promote [Piece]</p>
-                <ul>
-                    <li><code>e8=Q</code> → Say: <strong>"e eight promote queen"</strong></li>
-                    <li><code>a1=N</code> → Say: <strong>"a one promote knight"</strong></li>
-                </ul>
-                <p><strong>Alternative:</strong> <strong>"e eight queen"</strong> or <strong>"promote to queen"</strong></p>
-            </div>
-
-            <div class="instruction-section">
-                <h3>🔤 Piece Names</h3>
-                <ul>
-                    <li><strong>King</strong> = K</li>
-                    <li><strong>Queen</strong> = Q</li>
-                    <li><strong>Rook</strong> = R</li>
-                    <li><strong>Bishop</strong> = B</li>
-                    <li><strong>Knight</strong> = N (say "knight" NOT "N")</li>
-                    <li><strong>Pawn</strong> = (no letter, just the square)</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>📍 Files and Ranks</h3>
-                <p><strong>Files (columns):</strong> a, b, c, d, e, f, g, h</p>
-                <p><strong>Ranks (rows):</strong> 1, 2, 3, 4, 5, 6, 7, 8</p>
-                <p><strong>Say them clearly:</strong></p>
-                <ul>
-                    <li>"a" = "ay" (like the letter A)</li>
-                    <li>"b" = "bee"</li>
-                    <li>"c" = "see"</li>
-                    <li>"d" = "dee"</li>
-                    <li>"e" = "ee"</li>
-                    <li>"f" = "eff"</li>
-                    <li>"g" = "gee"</li>
-                    <li>"h" = "aitch" or "haitch"</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>💡 All Valid Ways to Say Moves</h3>
-                <p><strong>Example: Moving pawn to e4</strong></p>
-                <ul>
-                    <li>✅ "e four"</li>
-                    <li>✅ "pawn e four"</li>
-                    <li>✅ "pawn to e four"</li>
-                    <li>✅ "e 4" (with pause)</li>
-                </ul>
-                
-                <p><strong>Example: Knight to f3</strong></p>
-                <ul>
-                    <li>✅ "knight f three"</li>
-                    <li>✅ "knight to f three"</li>
-                    <li>✅ "n f three"</li>
-                </ul>
-
-                <p><strong>Example: Bishop captures c4</strong></p>
-                <ul>
-                    <li>✅ "bishop takes c four"</li>
-                    <li>✅ "bishop captures c four"</li>
-                    <li>✅ "b takes c four"</li>
-                    <li>✅ "take c four with bishop"</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>🎤 Tips for Best Recognition</h3>
-                <ul>
-                    <li>Speak <strong>clearly and naturally</strong> (not too fast)</li>
-                    <li>Pause slightly between file and rank: "e... four"</li>
-                    <li>English voice recognition is <strong>85-90% accurate</strong> (vs 70% Spanish)</li>
-                    <li>System finds <strong>closest legal move</strong> automatically</li>
-                    <li>If wrong move, use <strong>"Undo"</strong> button</li>
-                    <li>Can mix notation styles (the system understands all)</li>
-                </ul>
-            </div>
-
-            <div class="instruction-section">
-                <h3>⌨️ Keyboard Shortcuts</h3>
-                <ul>
-                    <li><strong>N</strong> = New game</li>
-                    <li><strong>V</strong> = Toggle voice</li>
-                    <li><strong>U</strong> = Undo</li>
-                    <li><strong>H</strong> = Help</li>
-                    <li><strong>B</strong> = Hide/Show board</li>
+                    <li><code>O-O</code> → Say: <strong>"castle kingside"</strong></li>
+                    <li><code>O-O-O</code> → Say: <strong>"castle queenside"</strong></li>
                 </ul>
             </div>
 
@@ -928,7 +841,7 @@
                 return;
             }
             recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';  // INGLÉS
+            recognition.lang = 'en-US';
             recognition.continuous = true;
             recognition.interimResults = false;
             recognition.maxAlternatives = 5;
@@ -946,46 +859,65 @@
                 
                 if (result.isFinal && waitingForMove && !isSpeaking) {
                     let bestTranscript = result[0].transcript.toLowerCase();
-                    let bestMove = null;
+                    let parsedMove = null;
                     
+                    // Probar todas las alternativas
                     for (let i = 0; i < result.length; i++) {
                         const alt = result[i].transcript.toLowerCase();
-                        console.log(`Alt ${i}:`, alt);
-                        const cleanAlt = cleanText(alt);
-                        const parsed = parseEnglishMove(cleanAlt);
+                        console.log(`Alternative ${i}:`, alt);
                         
-                        if (parsed) {
-                            bestTranscript = alt;
-                            bestMove = parsed;
-                            break;
+                        const cleanAlt = cleanText(alt);
+                        const moveAttempt = parseEnglishMove(cleanAlt);
+                        
+                        if (moveAttempt) {
+                            // Verificar que el movimiento sea legal
+                            try {
+                                const testMove = game.move(moveAttempt, {sloppy: true});
+                                if (testMove) {
+                                    game.undo(); // Deshacer el test
+                                    parsedMove = moveAttempt;
+                                    bestTranscript = alt;
+                                    break;
+                                }
+                            } catch(e) {}
                         }
                         
+                        // Fallback: buscar movimiento más parecido
                         const fuzzyMove = findBestLegalMove(cleanAlt);
-                        if (fuzzyMove) {
+                        if (fuzzyMove && !parsedMove) {
+                            parsedMove = fuzzyMove.san;
                             bestTranscript = alt;
-                            bestMove = fuzzyMove;
-                            break;
                         }
                     }
                     
                     elements.spokenText.textContent = `"${bestTranscript}"`;
                     waitingForMove = false;
                     
-                    if (bestMove) {
-                        const moveResult = typeof bestMove === 'string' 
-                            ? game.move(bestMove, {sloppy: true})
-                            : game.move(bestMove);
+                    // FIX: EJECUTAR EL MOVIMIENTO
+                    if (parsedMove) {
+                        try {
+                            const moveResult = game.move(parsedMove, {sloppy: true});
                             
-                        if (moveResult) {
-                            playSuccessBeep();
-                            speak(`${moveResult.san}`);
-                            renderBoard();
-                            updateUI();
-                            checkGameEnd();
-                            
-                            if (!game.game_over() && game.turn() !== playerColor) {
-                                setTimeout(requestAIMove, 600);
+                            if (moveResult) {
+                                playSuccessBeep();
+                                speak(`${moveResult.san}`);
+                                renderBoard(); // RENDERIZAR EL TABLERO
+                                updateUI();
+                                checkGameEnd();
+                                
+                                if (!game.game_over() && game.turn() !== playerColor) {
+                                    setTimeout(requestAIMove, 600);
+                                }
+                            } else {
+                                playErrorBeep();
+                                elements.spokenText.textContent = '❌ Illegal move';
+                                setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
                             }
+                        } catch(error) {
+                            console.error('Move error:', error);
+                            playErrorBeep();
+                            elements.spokenText.textContent = '❌ Error';
+                            setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
                         }
                     } else {
                         playErrorBeep();
@@ -1027,7 +959,6 @@
                 return 'O-O-O';
             }
             
-            // Mapeo de piezas en inglés
             const pieceMap = {
                 'knight': 'N', 'n': 'N',
                 'bishop': 'B', 'b': 'B',
@@ -1037,7 +968,6 @@
                 'pawn': ''
             };
             
-            // Mapeo de promociones
             const promotionMap = {
                 'queen': 'q', 'q': 'q',
                 'rook': 'r', 'r': 'r',
@@ -1049,22 +979,19 @@
             let capture = false;
             let promotion = null;
             
-            // Detectar captura
             if (text.includes('takes') || text.includes('captures') || text.includes('x')) {
                 capture = true;
                 text = text.replace('takes', '').replace('captures', '').replace('x', '');
             }
             
-            // Detectar promoción
             for (const [word, symbol] of Object.entries(promotionMap)) {
-                if (text.includes('promote' + word) || text.includes(word) && text.includes('eight')) {
+                if (text.includes('promote' + word) || (text.includes(word) && (text.includes('eight') || text.includes('one')))) {
                     promotion = symbol;
                     text = text.replace('promote', '').replace(word, '');
                     break;
                 }
             }
             
-            // Detectar pieza
             for (const [word, symbol] of Object.entries(pieceMap)) {
                 if (text.includes(word)) {
                     piece = symbol;
@@ -1073,7 +1000,6 @@
                 }
             }
             
-            // Buscar casilla (dos caracteres: letra + número)
             const squareMatch = text.match(/([a-h])([1-8])/);
             if (squareMatch) {
                 let moveStr = piece + (capture ? 'x' : '') + squareMatch[0];
@@ -1107,7 +1033,7 @@
             permissionDenied = false;
             try {
                 recognition.start();
-                speak('Voice activated. Say your move.', false);
+                speak('Voice activated.', false);
             } catch (error) {
                 voiceActive = false;
                 playErrorBeep();
@@ -1132,7 +1058,7 @@
             isSpeaking = true;
             
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US';  // INGLÉS
+            utterance.lang = 'en-US';
             utterance.rate = 0.9;
             
             const voices = synthesis.getVoices();
@@ -1180,12 +1106,10 @@
                 } else {
                     playErrorBeep();
                     speak('Illegal move');
-                    setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
                 }
             } catch (error) {
                 playErrorBeep();
                 speak('Illegal move');
-                setTimeout(() => { if (voiceActive) waitingForMove = true; }, 1500);
             }
         }
 
