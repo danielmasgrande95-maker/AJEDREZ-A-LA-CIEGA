@@ -247,6 +247,96 @@
             margin-bottom: 20px;
         }
 
+        .voice-config {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .voice-config .language-select-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 160px;
+        }
+
+        .voice-config label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        #language-select {
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 14px;
+            font-weight: 600;
+            background: rgba(255,255,255,0.95);
+            color: #1A1A2E;
+        }
+
+        .phonetic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .phonetic-preferences {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .phonetic-preferences label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.92);
+            border: 2px solid rgba(0,0,0,0.05);
+            color: #1A1A2E;
+            font-weight: 600;
+        }
+
+        .phonetic-preferences input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
+        .phonetic-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .phonetic-item span {
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .phonetic-item input {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            font-size: 13px;
+            background: rgba(255,255,255,0.95);
+            color: #1A1A2E;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
         #listen-btn {
             flex: 1;
             padding: 18px;
@@ -534,7 +624,7 @@
         </div>
 
         <div class="voice-status" id="voice-status">
-            🎤 Micrófono activo - Di: "letra-número hasta letra-número"
+            🎤 Preparado para reconocimiento de voz
         </div>
 
         <div class="voice-controls">
@@ -544,6 +634,20 @@
             </button>
             <button id="repeat-btn" class="btn btn-secondary">
                 🔊 Repetir
+            </button>
+        </div>
+
+        <div class="voice-config">
+            <div class="language-select-group">
+                <label for="language-select">🎙️ Idioma del reconocimiento</label>
+                <select id="language-select">
+                    <option value="dual">Español + Inglés</option>
+                    <option value="es-ES">Solo español</option>
+                    <option value="en-US">Solo inglés</option>
+                </select>
+            </div>
+            <button id="phonetic-config-btn" class="btn btn-secondary" style="min-width: 160px;">
+                ⚙️ Alfabeto
             </button>
         </div>
 
@@ -576,15 +680,16 @@
             <div class="instruction-section">
                 <h3>🔤 Alfabeto Fonético (sonidos diferenciables)</h3>
                 <ul>
-                    <li><code>a</code> → Di: <strong>"a"</strong></li>
-                    <li><code>b</code> → Di: <strong>"bi"</strong></li>
-                    <li><code>c</code> → Di: <strong>"co"</strong></li>
-                    <li><code>d</code> → Di: <strong>"du"</strong></li>
-                    <li><code>e</code> → Di: <strong>"e"</strong></li>
-                    <li><code>f</code> → Di: <strong>"fa"</strong></li>
-                    <li><code>g</code> → Di: <strong>"ge"</strong></li>
-                    <li><code>h</code> → Di: <strong>"ju"</strong></li>
+                    <li><code>a</code> → "a", <strong>"alfa" / "alpha"</strong></li>
+                    <li><code>b</code> → "bi", <strong>"bravo"</strong></li>
+                    <li><code>c</code> → "co", <strong>"charlie"</strong></li>
+                    <li><code>d</code> → "du", <strong>"delta"</strong></li>
+                    <li><code>e</code> → "e", <strong>"eco" / "echo"</strong></li>
+                    <li><code>f</code> → "fa", <strong>"foxtrot"</strong></li>
+                    <li><code>g</code> → "ge", <strong>"golf"</strong></li>
+                    <li><code>h</code> → "ju", <strong>"hotel" / "aitch"</strong></li>
                 </ul>
+                <p style="margin-top: 8px;">¿Prefieres otras palabras? Usa el botón <strong>⚙️ Alfabeto</strong> para personalizar cada letra.</p>
             </div>
 
             <div class="instruction-section">
@@ -630,6 +735,62 @@
                 <div class="promotion-piece" data-piece="r" title="Torre">♖</div>
                 <div class="promotion-piece" data-piece="b" title="Alfil">♗</div>
                 <div class="promotion-piece" data-piece="n" title="Caballo">♘</div>
+            </div>
+        </div>
+    </div>
+
+        <div id="phonetic-modal" class="modal">
+            <div class="modal-content">
+                <h2>🔧 Configurar Alfabeto Fonético</h2>
+                <p style="margin-bottom: 10px;">Escribe palabras separadas por comas para cada letra. Se reconocerán junto a las oficiales en español e inglés.</p>
+                <div class="phonetic-preferences">
+                    <label>
+                        <input type="checkbox" id="include-official-es" checked>
+                        Mantener palabras oficiales en español (Alfa, Bravo...)
+                    </label>
+                    <label>
+                        <input type="checkbox" id="include-official-en" checked>
+                        Mantener palabras oficiales en inglés (Alpha, Bravo...)
+                    </label>
+                </div>
+                <p style="margin-top: 8px; font-size: 13px; color: #1A1A2E;">Desactiva las casillas si prefieres que solo se reconozcan tus palabras personalizadas.</p>
+                <div class="phonetic-grid">
+                    <div class="phonetic-item">
+                        <span>A</span>
+                        <input type="text" id="phonetic-a" data-phonetic-letter="a" placeholder="a, alfa, alpha">
+                </div>
+                <div class="phonetic-item">
+                    <span>B</span>
+                    <input type="text" id="phonetic-b" data-phonetic-letter="b" placeholder="b, bravo">
+                </div>
+                <div class="phonetic-item">
+                    <span>C</span>
+                    <input type="text" id="phonetic-c" data-phonetic-letter="c" placeholder="c, charlie">
+                </div>
+                <div class="phonetic-item">
+                    <span>D</span>
+                    <input type="text" id="phonetic-d" data-phonetic-letter="d" placeholder="d, delta">
+                </div>
+                <div class="phonetic-item">
+                    <span>E</span>
+                    <input type="text" id="phonetic-e" data-phonetic-letter="e" placeholder="e, eco">
+                </div>
+                <div class="phonetic-item">
+                    <span>F</span>
+                    <input type="text" id="phonetic-f" data-phonetic-letter="f" placeholder="f, foxtrot">
+                </div>
+                <div class="phonetic-item">
+                    <span>G</span>
+                    <input type="text" id="phonetic-g" data-phonetic-letter="g" placeholder="g, golf">
+                </div>
+                <div class="phonetic-item">
+                    <span>H</span>
+                    <input type="text" id="phonetic-h" data-phonetic-letter="h" placeholder="h, hotel">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="reset-phonetic-btn" class="btn btn-secondary" type="button">🔄 Restaurar oficial</button>
+                <button id="save-phonetic-btn" class="btn btn-primary" type="button">💾 Guardar</button>
             </div>
         </div>
     </div>
@@ -748,6 +909,41 @@
             }
         };
 
+        const storageKeys = {
+            phonetics: 'blindfold-chess-phonetics',
+            phoneticSettings: 'blindfold-chess-phonetic-settings',
+            recognitionMode: 'blindfold-chess-recognition-mode'
+        };
+
+        const officialPhonetics = {
+            a: { es: ['a', 'alfa'], en: ['a', 'alpha', 'ay', 'ah'] },
+            b: { es: ['b', 'be', 'bi', 'bravo', 'beta'], en: ['b', 'bee', 'bravo'] },
+            c: { es: ['c', 'ce', 'ci', 'charly', 'charlie', 'se'], en: ['c', 'see', 'cee', 'charlie'] },
+            d: { es: ['d', 'de', 'di', 'delta', 'du'], en: ['d', 'dee', 'delta'] },
+            e: { es: ['e', 'eco'], en: ['e', 'echo', 'eh'] },
+            f: { es: ['f', 'efe', 'foxtrot', 'fa'], en: ['f', 'ef', 'foxtrot', 'eff'] },
+            g: { es: ['g', 'ge', 'golf', 'gue', 'he'], en: ['g', 'gee', 'golf'] },
+            h: { es: ['h', 'hache', 'hotel', 'ache', 'ju', 'chu'], en: ['h', 'aitch', 'hotel'] }
+        };
+
+        const defaultPhoneticSettings = {
+            includeOfficialEs: true,
+            includeOfficialEn: true
+        };
+
+        const defaultNumberMap = {
+            'uno': '1', 'un': '1', 'una': '1', 'one': '1', 'won': '1',
+            'dos': '2', 'two': '2', 'too': '2', 'deuce': '2',
+            'tres': '3', 'three': '3', 'tree': '3',
+            'cuatro': '4', 'four': '4', 'for': '4',
+            'cinco': '5', 'five': '5',
+            'seis': '6', 'six': '6',
+            'siete': '7', 'seven': '7',
+            'ocho': '8', 'eight': '8', 'ate': '8'
+        };
+
+        const connectorWords = new Set(['hasta', 'asta', 'a', 'al', 'hacia', 'para', 'y', 'and', 'to', 'unto', 'into', 'towards', 'toward', 'hasta']);
+
         let game = new Chess();
         let recognition = null;
         let synthesis = window.speechSynthesis;
@@ -762,6 +958,10 @@
         let waitingForMove = false;
         let permissionDenied = false;
         let isSpeaking = false;
+        let customPhonetics = loadCustomPhonetics();
+        let recognitionMode = loadRecognitionMode();
+        let phoneticSettings = loadPhoneticSettings();
+        let editingPhoneticSettings = null;
 
         const elements = {
             board: document.getElementById('board'),
@@ -781,7 +981,13 @@
             resignBtn: document.getElementById('resign-btn'),
             drawBtn: document.getElementById('draw-btn'),
             helpBtn: document.getElementById('help-btn'),
-            voiceStatus: document.getElementById('voice-status')
+            voiceStatus: document.getElementById('voice-status'),
+            languageSelect: document.getElementById('language-select'),
+            phoneticBtn: document.getElementById('phonetic-config-btn'),
+            savePhoneticBtn: document.getElementById('save-phonetic-btn'),
+            resetPhoneticBtn: document.getElementById('reset-phonetic-btn'),
+            includeOfficialEs: document.getElementById('include-official-es'),
+            includeOfficialEn: document.getElementById('include-official-en')
         };
 
         function init() {
@@ -789,7 +995,14 @@
             setupEventListeners();
             renderBoard();
             updateUI();
-            speak('Ajedrez a ciegas. Blancas.');
+            if (elements.languageSelect) {
+                elements.languageSelect.value = recognitionMode;
+            }
+            updateVoiceStatusMessage();
+            const openingMessage = recognitionMode === 'en-US'
+                ? 'Blindfold chess. White to move.'
+                : 'Ajedrez a ciegas. Blancas.';
+            speak(openingMessage);
         }
 
         function initSpeechRecognition() {
@@ -800,16 +1013,17 @@
                 return;
             }
             recognition = new SpeechRecognition();
-            recognition.lang = 'es-ES';
+            recognition.lang = getRecognitionLang();
             recognition.continuous = true;
             recognition.interimResults = false;
             recognition.maxAlternatives = 5;
-            
+
             recognition.onstart = () => {
                 permissionDenied = false;
                 elements.listenBtn.classList.add('listening');
                 elements.listenText.textContent = 'Escuchando...';
                 elements.voiceStatus.classList.add('active');
+                updateVoiceStatusMessage();
             };
             
             recognition.onresult = (event) => {
@@ -896,11 +1110,13 @@
 
         function parsePhoneticMove(text) {
             // Limpiar texto
-            text = text.toLowerCase().trim()
-                .replace(/[áàäâ]/g, 'a').replace(/[éèëê]/g, 'e')
-                .replace(/[íìïî]/g, 'i').replace(/[óòöô]/g, 'o')
-                .replace(/[úùüû]/g, 'u');
-            
+            text = text
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[.,;:!¿?]/g, ' ')
+                .trim();
+
             console.log('Parseando:', text);
             
             // Enroques
@@ -911,64 +1127,72 @@
                 return {from: 'e1', to: 'c1'};
             }
             
-            // Mapeo fonético: palabra → letra
-            const phoneticMap = {
-                'a': 'a',
-                'bi': 'b', 'be': 'b', 'vi': 'b',
-                'co': 'c', 'se': 'c',
-                'du': 'd', 'de': 'd',
-                'e': 'e',
-                'fa': 'f', 'efe': 'f',
-                'ge': 'g', 'he': 'g',
-                'ju': 'h', 'chu': 'h', 'hache': 'h'
-            };
-            
-            const numberMap = {
-                'uno': '1', 'dos': '2', 'tres': '3', 'cuatro': '4',
-                'cinco': '5', 'seis': '6', 'siete': '7', 'ocho': '8',
-                '1': '1', '2': '2', '3': '3', '4': '4',
-                '5': '5', '6': '6', '7': '7', '8': '8',
-                'un': '1'
-            };
-            
-            // Dividir por "hasta"
-            let parts = [];
-            if (text.includes('hasta')) {
-                parts = text.split('hasta');
-            } else if (text.includes('asta')) {
-                parts = text.split('asta');
-            } else {
-                // Intentar detectar sin "hasta"
-                parts = [text];
+            const shortCastlePatterns = [
+                /enroque\s*corto/,
+                /castle\s*(short|king\s*side|kingside)/,
+                /castling\s*(short|king\s*side|kingside)/,
+                /0-0/,
+                /\bo-o\b/,
+                /\boh oh\b/,
+                /\bzero zero\b/
+            ];
+
+            const longCastlePatterns = [
+                /enroque\s*largo/,
+                /castle\s*(long|queen\s*side|queenside)/,
+                /castling\s*(long|queen\s*side|queenside)/,
+                /\bqueen\s*side\b/,
+                /0-0-0/,
+                /\bo-o-o\b/,
+                /\bzero zero zero\b/
+            ];
+
+            if (shortCastlePatterns.some(pattern => pattern.test(text))) {
+                return {from: 'e1', to: 'g1'};
             }
-            
-            let squares = [];
-            
-            for (const part of parts) {
-                const words = part.trim().split(/\s+/);
-                
-                for (let i = 0; i < words.length; i++) {
-                    const word = words[i].replace(/-/g, '').replace(/,/g, '');
-                    
-                    // Buscar letra fonética
-                    if (phoneticMap[word]) {
-                        const letter = phoneticMap[word];
-                        
-                        // Buscar número siguiente
-                        if (i + 1 < words.length) {
-                            const nextWord = words[i + 1].replace(/-/g, '');
-                            if (numberMap[nextWord]) {
-                                const number = numberMap[nextWord];
-                                squares.push(letter + number);
-                                i++; // Saltar número
-                            }
+            if (longCastlePatterns.some(pattern => pattern.test(text))) {
+                return {from: 'e1', to: 'c1'};
+            }
+
+            const phoneticMap = buildPhoneticDictionary();
+            const words = text.split(/\s+/);
+            const squares = [];
+
+            for (let i = 0; i < words.length; i++) {
+                const cleaned = normalizeWord(words[i]);
+                if (!cleaned) continue;
+
+                if (/^[a-h][1-8]$/.test(cleaned)) {
+                    squares.push(cleaned);
+                    continue;
+                }
+
+                const letter = phoneticMap[cleaned];
+                if (letter) {
+                    for (let j = i + 1; j < words.length; j++) {
+                        const nextClean = normalizeWord(words[j]);
+                        if (!nextClean) continue;
+
+                        if (phoneticMap[nextClean] && !defaultNumberMap[nextClean]) {
+                            break;
+                        }
+
+                        if (connectorWords.has(nextClean)) {
+                            continue;
+                        }
+
+                        const number = getNumberFromWord(nextClean);
+                        if (number) {
+                            squares.push(letter + number);
+                            i = j;
+                            break;
                         }
                     }
                 }
             }
-            
+
             console.log('Casillas detectadas:', squares);
-            
+
             if (squares.length >= 2) {
                 return {
                     from: squares[0],
@@ -976,7 +1200,7 @@
                     promotion: null
                 };
             }
-            
+
             return null;
         }
 
@@ -998,15 +1222,16 @@
             waitingForMove = game.turn() === playerColor;
             permissionDenied = false;
             try {
+                recognition.lang = getRecognitionLang();
                 recognition.start();
-                speak('Voz activada. Di: letra-número hasta letra-número', false);
+                speak(getVoiceActivationPrompt(), false);
             } catch (error) {
                 voiceActive = false;
                 playErrorBeep();
             }
         }
 
-        function stopVoiceRecognition() {
+        function stopVoiceRecognition(silent = false) {
             if (!voiceActive) return;
             voiceActive = false;
             waitingForMove = false;
@@ -1014,7 +1239,9 @@
             elements.listenBtn.classList.remove('listening');
             elements.listenText.textContent = 'Activar Voz';
             elements.voiceStatus.classList.remove('active');
-            speak('Voz desactivada.', false);
+            if (!silent) {
+                speak(getVoiceDeactivationPrompt(), false);
+            }
         }
 
         function speak(text, save = true) {
@@ -1022,15 +1249,16 @@
             elements.spokenText.textContent = text;
             synthesis.cancel();
             isSpeaking = true;
-            
+
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'es-ES';
+            utterance.lang = recognitionMode === 'en-US' ? 'en-US' : 'es-ES';
             utterance.rate = 0.9;
-            
+
             const voices = synthesis.getVoices();
-            const spanishVoice = voices.find(v => v.lang.startsWith('es'));
-            if (spanishVoice) utterance.voice = spanishVoice;
-            
+            const preferredLang = recognitionMode === 'en-US' ? 'en' : 'es';
+            const preferredVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(preferredLang));
+            if (preferredVoice) utterance.voice = preferredVoice;
+
             utterance.onend = () => {
                 isSpeaking = false;
                 if (voiceActive && game.turn() === playerColor && !game.game_over()) {
@@ -1299,7 +1527,33 @@
             elements.resignBtn.addEventListener('click', resign);
             elements.drawBtn.addEventListener('click', offerDraw);
             elements.helpBtn.addEventListener('click', () => openModal('help-modal'));
-            
+            elements.phoneticBtn.addEventListener('click', openPhoneticModal);
+            elements.savePhoneticBtn.addEventListener('click', savePhoneticConfig);
+            elements.resetPhoneticBtn.addEventListener('click', resetPhoneticConfig);
+            if (elements.includeOfficialEs) {
+                elements.includeOfficialEs.addEventListener('change', handlePhoneticPreferenceChange);
+            }
+            if (elements.includeOfficialEn) {
+                elements.includeOfficialEn.addEventListener('change', handlePhoneticPreferenceChange);
+            }
+
+            elements.languageSelect.addEventListener('change', (event) => {
+                recognitionMode = event.target.value;
+                try {
+                    localStorage.setItem(storageKeys.recognitionMode, recognitionMode);
+                } catch (error) {
+                    console.warn('No se pudo guardar el modo de idioma', error);
+                }
+                updateVoiceStatusMessage();
+                if (recognition) {
+                    recognition.lang = getRecognitionLang();
+                }
+                if (voiceActive) {
+                    stopVoiceRecognition(true);
+                    setTimeout(() => startVoiceRecognition(), 300);
+                }
+            });
+
             elements.moveInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     const input = elements.moveInput.value.trim().toLowerCase();
@@ -1343,14 +1597,264 @@
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            if (id === 'phonetic-modal') {
+                editingPhoneticSettings = null;
+                if (elements.includeOfficialEs) {
+                    elements.includeOfficialEs.checked = phoneticSettings.includeOfficialEs;
+                }
+                if (elements.includeOfficialEn) {
+                    elements.includeOfficialEn.checked = phoneticSettings.includeOfficialEn;
+                }
+            }
         }
 
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.classList.remove('active');
+                if (e.target === modal) closeModal(modal.id);
             });
         });
+
+        function normalizeWord(word) {
+            return word
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]/g, '');
+        }
+
+        function collectOfficialWords(letter, settings = phoneticSettings) {
+            const words = new Set();
+            const data = officialPhonetics[letter];
+            if (!data) return Array.from(words);
+            if (settings.includeOfficialEs && Array.isArray(data.es)) {
+                data.es.forEach(entry => words.add(entry));
+            }
+            if (settings.includeOfficialEn && Array.isArray(data.en)) {
+                data.en.forEach(entry => words.add(entry));
+            }
+            return Array.from(words);
+        }
+
+        function refreshPhoneticPlaceholders() {
+            const activeSettings = editingPhoneticSettings || phoneticSettings;
+            document.querySelectorAll('[data-phonetic-letter]').forEach(input => {
+                const letter = input.dataset.phoneticLetter;
+                const activeWords = collectOfficialWords(letter, activeSettings);
+                let placeholder = '';
+                if (activeWords.length) {
+                    placeholder = activeWords.join(', ');
+                } else {
+                    const fallback = collectOfficialWords(letter, defaultPhoneticSettings);
+                    placeholder = fallback.length
+                        ? `${fallback.join(', ')} (desactivadas)`
+                        : 'Añade palabras personalizadas';
+                }
+                input.placeholder = placeholder;
+            });
+        }
+
+        function handlePhoneticPreferenceChange() {
+            if (!editingPhoneticSettings) {
+                editingPhoneticSettings = {...phoneticSettings};
+            }
+            if (elements.includeOfficialEs) {
+                editingPhoneticSettings.includeOfficialEs = elements.includeOfficialEs.checked;
+            }
+            if (elements.includeOfficialEn) {
+                editingPhoneticSettings.includeOfficialEn = elements.includeOfficialEn.checked;
+            }
+            refreshPhoneticPlaceholders();
+        }
+
+        function buildPhoneticDictionary() {
+            const dictionary = {};
+            Object.keys(officialPhonetics).forEach(letter => {
+                const words = new Set();
+                collectOfficialWords(letter).forEach(entry => {
+                    const normalized = normalizeWord(entry);
+                    if (normalized) words.add(normalized);
+                });
+                words.add(letter);
+                if (customPhonetics[letter]) {
+                    customPhonetics[letter].forEach(entry => {
+                        const normalized = normalizeWord(entry);
+                        if (normalized) words.add(normalized);
+                    });
+                }
+                words.forEach(word => {
+                    dictionary[word] = letter;
+                });
+            });
+            return dictionary;
+        }
+
+        function getNumberFromWord(word) {
+            if (!word) return null;
+            if (defaultNumberMap[word]) return defaultNumberMap[word];
+            if (/^[1-8]$/.test(word)) return word;
+            return null;
+        }
+
+        function loadCustomPhonetics() {
+            try {
+                const stored = localStorage.getItem(storageKeys.phonetics);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (typeof parsed === 'object' && parsed !== null) {
+                        return parsed;
+                    }
+                }
+            } catch (error) {
+                console.warn('No se pudieron cargar los fonéticos personalizados', error);
+            }
+            return {};
+        }
+
+        function loadPhoneticSettings() {
+            try {
+                const stored = localStorage.getItem(storageKeys.phoneticSettings);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && typeof parsed === 'object') {
+                        return {
+                            ...defaultPhoneticSettings,
+                            ...parsed
+                        };
+                    }
+                }
+            } catch (error) {
+                console.warn('No se pudieron cargar las preferencias fonéticas', error);
+            }
+            return {...defaultPhoneticSettings};
+        }
+
+        function loadRecognitionMode() {
+            try {
+                const stored = localStorage.getItem(storageKeys.recognitionMode);
+                if (stored && ['dual', 'es-ES', 'en-US'].includes(stored)) {
+                    return stored;
+                }
+            } catch (error) {
+                console.warn('No se pudo cargar el modo de idioma', error);
+            }
+            return 'dual';
+        }
+
+        function savePhoneticConfig() {
+            const newConfig = {};
+            document.querySelectorAll('[data-phonetic-letter]').forEach(input => {
+                const letter = input.dataset.phoneticLetter;
+                const entries = input.value.split(',')
+                    .map(word => word.trim().toLowerCase())
+                    .filter(Boolean);
+                if (entries.length) {
+                    newConfig[letter] = Array.from(new Set(entries));
+                }
+            });
+            customPhonetics = newConfig;
+            const updatedSettings = editingPhoneticSettings ? {...editingPhoneticSettings} : {
+                includeOfficialEs: elements.includeOfficialEs ? elements.includeOfficialEs.checked : true,
+                includeOfficialEn: elements.includeOfficialEn ? elements.includeOfficialEn.checked : true
+            };
+            phoneticSettings = updatedSettings;
+            try {
+                localStorage.setItem(storageKeys.phonetics, JSON.stringify(customPhonetics));
+            } catch (error) {
+                console.warn('No se pudieron guardar los fonéticos personalizados', error);
+            }
+            try {
+                localStorage.setItem(storageKeys.phoneticSettings, JSON.stringify(phoneticSettings));
+            } catch (error) {
+                console.warn('No se pudieron guardar las preferencias fonéticas', error);
+            }
+            playSuccessBeep();
+            elements.spokenText.textContent = recognitionMode === 'en-US'
+                ? 'Custom alphabet saved'
+                : 'Alfabeto personalizado guardado';
+            editingPhoneticSettings = null;
+            closeModal('phonetic-modal');
+        }
+
+        function resetPhoneticConfig() {
+            customPhonetics = {};
+            try {
+                localStorage.removeItem(storageKeys.phonetics);
+            } catch (error) {
+                console.warn('No se pudieron eliminar los fonéticos personalizados', error);
+            }
+            try {
+                localStorage.removeItem(storageKeys.phoneticSettings);
+            } catch (error) {
+                console.warn('No se pudieron eliminar las preferencias fonéticas', error);
+            }
+            phoneticSettings = {...defaultPhoneticSettings};
+            editingPhoneticSettings = {...defaultPhoneticSettings};
+            if (elements.includeOfficialEs) {
+                elements.includeOfficialEs.checked = true;
+            }
+            if (elements.includeOfficialEn) {
+                elements.includeOfficialEn.checked = true;
+            }
+            populatePhoneticInputs();
+            playSuccessBeep();
+            elements.spokenText.textContent = recognitionMode === 'en-US'
+                ? 'Official alphabet restored'
+                : 'Alfabeto oficial restaurado';
+        }
+
+        function populatePhoneticInputs() {
+            editingPhoneticSettings = {...phoneticSettings};
+            if (elements.includeOfficialEs) {
+                elements.includeOfficialEs.checked = editingPhoneticSettings.includeOfficialEs;
+            }
+            if (elements.includeOfficialEn) {
+                elements.includeOfficialEn.checked = editingPhoneticSettings.includeOfficialEn;
+            }
+            document.querySelectorAll('[data-phonetic-letter]').forEach(input => {
+                const letter = input.dataset.phoneticLetter;
+                input.value = (customPhonetics[letter] || []).join(', ');
+            });
+            refreshPhoneticPlaceholders();
+        }
+
+        function openPhoneticModal() {
+            populatePhoneticInputs();
+            openModal('phonetic-modal');
+        }
+
+        function getRecognitionLang() {
+            if (recognitionMode === 'en-US') return 'en-US';
+            return 'es-ES';
+        }
+
+        function updateVoiceStatusMessage() {
+            if (!elements.voiceStatus) return;
+            let message = '🎤 Micrófono activo - Di: "letra-número hasta letra-número"';
+            if (recognitionMode === 'en-US') {
+                message = '🎤 Active microphone - Say: "file-number to file-number"';
+            } else if (recognitionMode === 'dual') {
+                message = '🎤 Micrófono activo / Active mic - Di o say: "letra-número hasta letra-número" / "file-number to file-number"';
+            }
+            elements.voiceStatus.textContent = message;
+        }
+
+        function getVoiceActivationPrompt() {
+            if (recognitionMode === 'en-US') {
+                return 'Voice enabled. Say: file-number to file-number';
+            }
+            if (recognitionMode === 'dual') {
+                return 'Voz activada. Puedes decir: letra-número hasta letra-número o file-number to file-number';
+            }
+            return 'Voz activada. Di: letra-número hasta letra-número';
+        }
+
+        function getVoiceDeactivationPrompt() {
+            return recognitionMode === 'en-US' ? 'Voice disabled.' : 'Voz desactivada.';
+        }
 
         window.addEventListener('load', init);
     </script>
