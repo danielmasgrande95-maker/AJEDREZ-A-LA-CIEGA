@@ -285,6 +285,31 @@
             margin-top: 15px;
         }
 
+        .phonetic-preferences {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .phonetic-preferences label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.92);
+            border: 2px solid rgba(0,0,0,0.05);
+            color: #1A1A2E;
+            font-weight: 600;
+        }
+
+        .phonetic-preferences input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary);
+        }
+
         .phonetic-item {
             display: flex;
             flex-direction: column;
@@ -714,14 +739,25 @@
         </div>
     </div>
 
-    <div id="phonetic-modal" class="modal">
-        <div class="modal-content">
-            <h2>🔧 Configurar Alfabeto Fonético</h2>
-            <p style="margin-bottom: 10px;">Escribe palabras separadas por comas para cada letra. Se reconocerán junto a las oficiales en español e inglés.</p>
-            <div class="phonetic-grid">
-                <div class="phonetic-item">
-                    <span>A</span>
-                    <input type="text" id="phonetic-a" data-phonetic-letter="a" placeholder="a, alfa, alpha">
+        <div id="phonetic-modal" class="modal">
+            <div class="modal-content">
+                <h2>🔧 Configurar Alfabeto Fonético</h2>
+                <p style="margin-bottom: 10px;">Escribe palabras separadas por comas para cada letra. Se reconocerán junto a las oficiales en español e inglés.</p>
+                <div class="phonetic-preferences">
+                    <label>
+                        <input type="checkbox" id="include-official-es" checked>
+                        Mantener palabras oficiales en español (Alfa, Bravo...)
+                    </label>
+                    <label>
+                        <input type="checkbox" id="include-official-en" checked>
+                        Mantener palabras oficiales en inglés (Alpha, Bravo...)
+                    </label>
+                </div>
+                <p style="margin-top: 8px; font-size: 13px; color: #1A1A2E;">Desactiva las casillas si prefieres que solo se reconozcan tus palabras personalizadas.</p>
+                <div class="phonetic-grid">
+                    <div class="phonetic-item">
+                        <span>A</span>
+                        <input type="text" id="phonetic-a" data-phonetic-letter="a" placeholder="a, alfa, alpha">
                 </div>
                 <div class="phonetic-item">
                     <span>B</span>
@@ -875,18 +911,24 @@
 
         const storageKeys = {
             phonetics: 'blindfold-chess-phonetics',
+            phoneticSettings: 'blindfold-chess-phonetic-settings',
             recognitionMode: 'blindfold-chess-recognition-mode'
         };
 
-        const defaultPhonetics = {
-            a: ['a', 'alfa', 'alpha'],
-            b: ['b', 'bi', 'bravo', 'be', 'beta', 'bee'],
-            c: ['c', 'co', 'charlie', 'ci', 'cee', 'se'],
-            d: ['d', 'du', 'delta', 'de', 'dee'],
-            e: ['e', 'eco', 'echo'],
-            f: ['f', 'fa', 'foxtrot', 'efe', 'eff'],
-            g: ['g', 'ge', 'golf', 'gee', 'he'],
-            h: ['h', 'ju', 'hotel', 'hache', 'aitch', 'ache', 'chu']
+        const officialPhonetics = {
+            a: { es: ['a', 'alfa'], en: ['a', 'alpha', 'ay', 'ah'] },
+            b: { es: ['b', 'be', 'bi', 'bravo', 'beta'], en: ['b', 'bee', 'bravo'] },
+            c: { es: ['c', 'ce', 'ci', 'charly', 'charlie', 'se'], en: ['c', 'see', 'cee', 'charlie'] },
+            d: { es: ['d', 'de', 'di', 'delta', 'du'], en: ['d', 'dee', 'delta'] },
+            e: { es: ['e', 'eco'], en: ['e', 'echo', 'eh'] },
+            f: { es: ['f', 'efe', 'foxtrot', 'fa'], en: ['f', 'ef', 'foxtrot', 'eff'] },
+            g: { es: ['g', 'ge', 'golf', 'gue', 'he'], en: ['g', 'gee', 'golf'] },
+            h: { es: ['h', 'hache', 'hotel', 'ache', 'ju', 'chu'], en: ['h', 'aitch', 'hotel'] }
+        };
+
+        const defaultPhoneticSettings = {
+            includeOfficialEs: true,
+            includeOfficialEn: true
         };
 
         const defaultNumberMap = {
@@ -918,6 +960,8 @@
         let isSpeaking = false;
         let customPhonetics = loadCustomPhonetics();
         let recognitionMode = loadRecognitionMode();
+        let phoneticSettings = loadPhoneticSettings();
+        let editingPhoneticSettings = null;
 
         const elements = {
             board: document.getElementById('board'),
@@ -941,7 +985,9 @@
             languageSelect: document.getElementById('language-select'),
             phoneticBtn: document.getElementById('phonetic-config-btn'),
             savePhoneticBtn: document.getElementById('save-phonetic-btn'),
-            resetPhoneticBtn: document.getElementById('reset-phonetic-btn')
+            resetPhoneticBtn: document.getElementById('reset-phonetic-btn'),
+            includeOfficialEs: document.getElementById('include-official-es'),
+            includeOfficialEn: document.getElementById('include-official-en')
         };
 
         function init() {
@@ -1484,6 +1530,12 @@
             elements.phoneticBtn.addEventListener('click', openPhoneticModal);
             elements.savePhoneticBtn.addEventListener('click', savePhoneticConfig);
             elements.resetPhoneticBtn.addEventListener('click', resetPhoneticConfig);
+            if (elements.includeOfficialEs) {
+                elements.includeOfficialEs.addEventListener('change', handlePhoneticPreferenceChange);
+            }
+            if (elements.includeOfficialEn) {
+                elements.includeOfficialEn.addEventListener('change', handlePhoneticPreferenceChange);
+            }
 
             elements.languageSelect.addEventListener('change', (event) => {
                 recognitionMode = event.target.value;
@@ -1545,12 +1597,24 @@
         }
 
         function closeModal(id) {
-            document.getElementById(id).classList.remove('active');
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.classList.remove('active');
+            }
+            if (id === 'phonetic-modal') {
+                editingPhoneticSettings = null;
+                if (elements.includeOfficialEs) {
+                    elements.includeOfficialEs.checked = phoneticSettings.includeOfficialEs;
+                }
+                if (elements.includeOfficialEn) {
+                    elements.includeOfficialEn.checked = phoneticSettings.includeOfficialEn;
+                }
+            }
         }
 
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.classList.remove('active');
+                if (e.target === modal) closeModal(modal.id);
             });
         });
 
@@ -1562,14 +1626,59 @@
                 .replace(/[^a-z0-9]/g, '');
         }
 
+        function collectOfficialWords(letter, settings = phoneticSettings) {
+            const words = new Set();
+            const data = officialPhonetics[letter];
+            if (!data) return Array.from(words);
+            if (settings.includeOfficialEs && Array.isArray(data.es)) {
+                data.es.forEach(entry => words.add(entry));
+            }
+            if (settings.includeOfficialEn && Array.isArray(data.en)) {
+                data.en.forEach(entry => words.add(entry));
+            }
+            return Array.from(words);
+        }
+
+        function refreshPhoneticPlaceholders() {
+            const activeSettings = editingPhoneticSettings || phoneticSettings;
+            document.querySelectorAll('[data-phonetic-letter]').forEach(input => {
+                const letter = input.dataset.phoneticLetter;
+                const activeWords = collectOfficialWords(letter, activeSettings);
+                let placeholder = '';
+                if (activeWords.length) {
+                    placeholder = activeWords.join(', ');
+                } else {
+                    const fallback = collectOfficialWords(letter, defaultPhoneticSettings);
+                    placeholder = fallback.length
+                        ? `${fallback.join(', ')} (desactivadas)`
+                        : 'Añade palabras personalizadas';
+                }
+                input.placeholder = placeholder;
+            });
+        }
+
+        function handlePhoneticPreferenceChange() {
+            if (!editingPhoneticSettings) {
+                editingPhoneticSettings = {...phoneticSettings};
+            }
+            if (elements.includeOfficialEs) {
+                editingPhoneticSettings.includeOfficialEs = elements.includeOfficialEs.checked;
+            }
+            if (elements.includeOfficialEn) {
+                editingPhoneticSettings.includeOfficialEn = elements.includeOfficialEn.checked;
+            }
+            refreshPhoneticPlaceholders();
+        }
+
         function buildPhoneticDictionary() {
             const dictionary = {};
-            Object.keys(defaultPhonetics).forEach(letter => {
+            Object.keys(officialPhonetics).forEach(letter => {
                 const words = new Set();
-                defaultPhonetics[letter].forEach(entry => {
+                collectOfficialWords(letter).forEach(entry => {
                     const normalized = normalizeWord(entry);
                     if (normalized) words.add(normalized);
                 });
+                words.add(letter);
                 if (customPhonetics[letter]) {
                     customPhonetics[letter].forEach(entry => {
                         const normalized = normalizeWord(entry);
@@ -1605,6 +1714,24 @@
             return {};
         }
 
+        function loadPhoneticSettings() {
+            try {
+                const stored = localStorage.getItem(storageKeys.phoneticSettings);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (parsed && typeof parsed === 'object') {
+                        return {
+                            ...defaultPhoneticSettings,
+                            ...parsed
+                        };
+                    }
+                }
+            } catch (error) {
+                console.warn('No se pudieron cargar las preferencias fonéticas', error);
+            }
+            return {...defaultPhoneticSettings};
+        }
+
         function loadRecognitionMode() {
             try {
                 const stored = localStorage.getItem(storageKeys.recognitionMode);
@@ -1629,15 +1756,26 @@
                 }
             });
             customPhonetics = newConfig;
+            const updatedSettings = editingPhoneticSettings ? {...editingPhoneticSettings} : {
+                includeOfficialEs: elements.includeOfficialEs ? elements.includeOfficialEs.checked : true,
+                includeOfficialEn: elements.includeOfficialEn ? elements.includeOfficialEn.checked : true
+            };
+            phoneticSettings = updatedSettings;
             try {
                 localStorage.setItem(storageKeys.phonetics, JSON.stringify(customPhonetics));
             } catch (error) {
                 console.warn('No se pudieron guardar los fonéticos personalizados', error);
             }
+            try {
+                localStorage.setItem(storageKeys.phoneticSettings, JSON.stringify(phoneticSettings));
+            } catch (error) {
+                console.warn('No se pudieron guardar las preferencias fonéticas', error);
+            }
             playSuccessBeep();
             elements.spokenText.textContent = recognitionMode === 'en-US'
                 ? 'Custom alphabet saved'
                 : 'Alfabeto personalizado guardado';
+            editingPhoneticSettings = null;
             closeModal('phonetic-modal');
         }
 
@@ -1648,6 +1786,19 @@
             } catch (error) {
                 console.warn('No se pudieron eliminar los fonéticos personalizados', error);
             }
+            try {
+                localStorage.removeItem(storageKeys.phoneticSettings);
+            } catch (error) {
+                console.warn('No se pudieron eliminar las preferencias fonéticas', error);
+            }
+            phoneticSettings = {...defaultPhoneticSettings};
+            editingPhoneticSettings = {...defaultPhoneticSettings};
+            if (elements.includeOfficialEs) {
+                elements.includeOfficialEs.checked = true;
+            }
+            if (elements.includeOfficialEn) {
+                elements.includeOfficialEn.checked = true;
+            }
             populatePhoneticInputs();
             playSuccessBeep();
             elements.spokenText.textContent = recognitionMode === 'en-US'
@@ -1656,11 +1807,18 @@
         }
 
         function populatePhoneticInputs() {
+            editingPhoneticSettings = {...phoneticSettings};
+            if (elements.includeOfficialEs) {
+                elements.includeOfficialEs.checked = editingPhoneticSettings.includeOfficialEs;
+            }
+            if (elements.includeOfficialEn) {
+                elements.includeOfficialEn.checked = editingPhoneticSettings.includeOfficialEn;
+            }
             document.querySelectorAll('[data-phonetic-letter]').forEach(input => {
                 const letter = input.dataset.phoneticLetter;
-                input.placeholder = defaultPhonetics[letter].join(', ');
                 input.value = (customPhonetics[letter] || []).join(', ');
             });
+            refreshPhoneticPlaceholders();
         }
 
         function openPhoneticModal() {
